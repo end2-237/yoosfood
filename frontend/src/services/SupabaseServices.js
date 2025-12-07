@@ -6,14 +6,190 @@ const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1N
 // Export du client Supabase pour l'authentification
 export const supabase = createClient(supabaseUrl, supabaseKey, {
     auth: {
-      persistSession: true, // Persiste la session dans le navigateur
-      autoRefreshToken: true, // Rafraîchit automatiquement le token
+      persistSession: true,
+      autoRefreshToken: true,
       detectSessionInUrl: true
     }
   })
 
 export const SupabaseService = {
+  // ============================================
+  // AUTHENTIFICATION
+  // ============================================
+  
+  /**
+   * Connexion admin avec email et mot de passe
+   */
+  async signIn(email, password) {
+    try {
+      console.log("🔐 Tentative de connexion pour:", email)
+      
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      })
+      
+      if (error) {
+        console.error("❌ Erreur auth:", error)
+        throw error
+      }
+      
+      console.log("✅ Authentification réussie!")
+      console.log("👤 User ID:", data.user.id)
+      console.log("📧 Email:", data.user.email)
+      
+      // Vérifier si l'utilisateur a le rôle admin
+      const isAdmin = await this.checkAdminRole(data.user.id)
+      
+      console.log("🎭 Résultat final - Is Admin:", isAdmin)
+      
+      return {
+        success: true,
+        user: data.user,
+        session: data.session,
+        isAdmin
+      }
+    } catch (error) {
+      console.error("❌ Erreur connexion:", error)
+      return {
+        success: false,
+        error: error.message
+      }
+    }
+  },
+
+  /**
+   * Déconnexion
+   */
+  async signOut() {
+    try {
+      const { error } = await supabase.auth.signOut()
+      if (error) throw error
+      return { success: true }
+    } catch (error) {
+      console.error("Erreur déconnexion:", error)
+      return { success: false, error: error.message }
+    }
+  },
+
+  /**
+   * Récupérer la session actuelle
+   */
+  async getSession() {
+    try {
+      const { data: { session }, error } = await supabase.auth.getSession()
+      if (error) throw error
+      
+      if (session) {
+        const isAdmin = await this.checkAdminRole(session.user.id)
+        return {
+          session,
+          user: session.user,
+          isAdmin
+        }
+      }
+      
+      return null
+    } catch (error) {
+      console.error("Erreur récupération session:", error)
+      return null
+    }
+  },
+
+  /**
+   * Vérifier si un utilisateur est admin
+   */
+  async checkAdminRole(userId) {
+    try {
+      console.log("🔍 Vérification du rôle pour userId:", userId)
+      
+      const { data, error } = await supabase
+        .from('users')
+        .select('role, email, full_name')
+        .eq('id', userId)
+        .single()
+      
+      if (error) {
+        console.error("❌ Erreur vérification rôle:", error)
+        console.error("❌ Code erreur:", error.code)
+        console.error("❌ Message:", error.message)
+        console.error("❌ Details:", error.details)
+        console.error("❌ Hint:", error.hint)
+        console.log("💡 L'utilisateur n'existe peut-être pas dans la table users")
+        console.log("🔧 Solution: Exécutez le SQL pour créer l'utilisateur dans la table users")
+        return false
+      }
+      
+      console.log("✅ Données utilisateur:", data)
+      console.log(`📋 Rôle: ${data?.role} | Is Admin: ${data?.role === 'admin'}`)
+      
+      return data?.role === 'admin'
+    } catch (error) {
+      console.error("❌ Exception vérification rôle:", error)
+      return false
+    }
+  },
+
+  /**
+   * Créer un compte admin (uniquement pour initialisation)
+   */
+  async createAdminAccount(email, password, fullName) {
+    try {
+      // 1. Créer l'utilisateur dans auth
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: fullName
+          }
+        }
+      })
+      
+      if (authError) throw authError
+
+      // 2. Ajouter l'utilisateur dans la table users avec le rôle admin
+      const { error: userError } = await supabase
+        .from('users')
+        .insert([{
+          id: authData.user.id,
+          email,
+          full_name: fullName,
+          role: 'admin',
+          created_at: new Date().toISOString()
+        }])
+      
+      if (userError) throw userError
+
+      return {
+        success: true,
+        user: authData.user
+      }
+    } catch (error) {
+      console.error("Erreur création compte admin:", error)
+      return {
+        success: false,
+        error: error.message
+      }
+    }
+  },
+
+  /**
+   * Écouter les changements d'authentification
+   */
+  onAuthStateChange(callback) {
+    return supabase.auth.onAuthStateChange(async (event, session) => {
+      let isAdmin = false
+      if (session?.user) {
+        isAdmin = await this.checkAdminRole(session.user.id)
+      }
+      callback(event, session, isAdmin)
+    })
+  },
+
+  // ============================================
   // PRODUITS
+  // ============================================
   async getProducts() {
     try {
       const { data, error } = await supabase
@@ -27,11 +203,6 @@ export const SupabaseService = {
       console.error("Erreur chargement produits:", error)
       return []
     }
-  },
-
-  async saveProducts(products) {
-    // Pas utilisé avec Supabase (on fait addProduct/updateProduct à la place)
-    return true
   },
 
   async addProduct(product) {
@@ -83,7 +254,9 @@ export const SupabaseService = {
     }
   },
 
+  // ============================================
   // AVIS
+  // ============================================
   async getReviews() {
     try {
       const { data, error } = await supabase
@@ -97,10 +270,6 @@ export const SupabaseService = {
       console.error("Erreur chargement avis:", error)
       return []
     }
-  },
-
-  async saveReviews(reviews) {
-    return true
   },
 
   async addReview(review) {
@@ -139,14 +308,12 @@ export const SupabaseService = {
 
   async toggleReviewApproval(id) {
     try {
-      // D'abord récupérer l'avis actuel
       const { data: review } = await supabase
         .from('reviews')
         .select('approved')
         .eq('id', id)
         .single()
       
-      // Inverser le statut
       const { data, error } = await supabase
         .from('reviews')
         .update({ approved: !review.approved })
@@ -176,7 +343,9 @@ export const SupabaseService = {
     }
   },
 
+  // ============================================
   // COMMANDES
+  // ============================================
   async getOrders() {
     try {
       const { data, error } = await supabase
@@ -190,10 +359,6 @@ export const SupabaseService = {
       console.error("Erreur chargement commandes:", error)
       return []
     }
-  },
-
-  async saveOrders(orders) {
-    return true
   },
 
   async addOrder(order) {
@@ -249,7 +414,9 @@ export const SupabaseService = {
     }
   },
 
+  // ============================================
   // STATS
+  // ============================================
   async getStats() {
     try {
       const orders = await this.getOrders()
@@ -291,7 +458,9 @@ export const SupabaseService = {
     }
   },
 
+  // ============================================
   // CONFIG
+  // ============================================
   async getConfig() {
     try {
       const { data, error } = await supabase
@@ -337,12 +506,13 @@ export const SupabaseService = {
     }
   },
 
+  // ============================================
   // INITIALISATION
+  // ============================================
   async initializeData() {
     try {
       console.log("🔄 Vérification des données initiales...");
       
-      // Vérifier si des produits existent
       const products = await this.getProducts()
       
       if (products.length === 0) {
@@ -385,7 +555,6 @@ export const SupabaseService = {
         console.log("✅ Produits initiaux créés");
       }
 
-      // Vérifier si des avis existent
       const reviews = await this.getReviews()
       
       if (reviews.length === 0) {
