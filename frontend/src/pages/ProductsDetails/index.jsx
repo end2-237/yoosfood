@@ -20,8 +20,6 @@ const ProductDetailModal = ({ product, config, onClose }) => {
   Quantité: ${quantity}
   Total: ${product.price * quantity} XAF
   
-  Voir le produit: ${product.image}
-  
   Merci !`;
     
     window.open(
