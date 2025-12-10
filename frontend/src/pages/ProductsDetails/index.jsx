@@ -13,7 +13,16 @@ const ProductDetailModal = ({ product, config, onClose }) => {
   if (!product) return null;
 
   const handleWhatsAppOrder = () => {
-    const message = `Bonjour Yoss Food ! Je souhaite commander :\n\n${product.name}\nPrix unitaire: ${product.price} XAF\nQuantité: ${quantity}\nTotal: ${product.price * quantity} XAF\n\nMerci !`;
+    const message = `Bonjour Yoss Food ! Je souhaite commander :
+  
+  ${product.name}
+  Prix unitaire: ${product.price} XAF
+  Quantité: ${quantity}
+  Total: ${product.price * quantity} XAF
+  
+  Voir le produit: ${product.image}
+  
+  Merci !`;
     
     window.open(
       `https://wa.me/${config.whatsapp}?text=${encodeURIComponent(message)}`,
@@ -24,7 +33,7 @@ const ProductDetailModal = ({ product, config, onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+      <div className="mt-20 bg-white rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
         <div className="relative">
           <button
             onClick={onClose}
