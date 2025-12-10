@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import ProductDetailModal from "../ProductsDetails";
 import {
   Phone,
   MapPin,
@@ -21,6 +22,7 @@ const PublicSite = ({ config, products, reviews, onAdminClick }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("Tous");
   const [scrolled, setScrolled] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   const promos = [
     {
       id: 1,
@@ -86,6 +88,17 @@ const PublicSite = ({ config, products, reviews, onAdminClick }) => {
 
   return (
     <div className="min-h-screen bg-white">
+
+      {/* Modal Détails Produit */}
+    {selectedProduct && (
+      <ProductDetailModal
+        product={selectedProduct}
+        config={config}
+        onClose={() => setSelectedProduct(null)}
+      />
+    )}
+
+
       {/* Header */}
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
@@ -447,13 +460,12 @@ const PublicSite = ({ config, products, reviews, onAdminClick }) => {
                         <span className="text-lg text-gray-600">XAF</span>
                       </div>
                       <button
-                        onClick={() =>
-                          handleWhatsAppOrder(item.name, item.price)
-                        }
-                        className="px-6 py-3 bg-gradient-to-r from-amber-600 to-amber-700 text-white rounded-xl font-semibold hover:scale-105 transition-all flex items-center gap-2"
-                      >
-                        <ShoppingBag size={18} />
-                      </button>
+  onClick={() => setSelectedProduct(item)}
+  className="px-6 py-3 bg-gradient-to-r from-amber-600 to-amber-700 text-white rounded-xl font-semibold hover:scale-105 transition-all flex items-center gap-2"
+>
+  Voir détails
+  <ChevronRight size={18} />
+</button>
                     </div>
                   </div>
                 </div>
