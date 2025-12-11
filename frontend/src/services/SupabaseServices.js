@@ -220,21 +220,38 @@ export const SupabaseService = {
 
   async addProduct(product) {
     try {
+      console.log("📦 Ajout produit:", product);
+      
+      // ✅ Nettoyer l'objet et enlever l'ID s'il existe
+      const cleanProduct = {
+        name: product.name,
+        description: product.description || "",
+        price: product.price,
+        category: product.category,
+        image: product.image || "",
+        popular: product.popular || false,
+        badge: product.badge || "",
+        stock: product.stock || 0,
+        created_at: new Date().toISOString(),
+      };
+
+      console.log("🧹 Produit nettoyé:", cleanProduct);
+
       const { data, error } = await supabase
         .from("products")
-        .insert([
-          {
-            ...product,
-            created_at: new Date().toISOString(),
-          },
-        ])
+        .insert([cleanProduct])
         .select();
 
-      if (error) throw error;
+      if (error) {
+        console.error("❌ Erreur Supabase:", error);
+        throw error;
+      }
+
+      console.log("✅ Produit créé:", data[0]);
       return data[0];
     } catch (error) {
-      console.error("Erreur ajout produit:", error);
-      return null;
+      console.error("❌ Erreur ajout produit:", error);
+      throw error; // ✅ Propager l'erreur au lieu de retourner null
     }
   },
 

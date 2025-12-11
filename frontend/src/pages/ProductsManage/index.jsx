@@ -4,15 +4,16 @@ import { Plus, Edit2, Trash2, Save, X, ArrowLeft, Package } from "lucide-react";
 const ProductsManager = ({ products, onSave, onBack }) => {
   const [editingProduct, setEditingProduct] = useState(null);
   const [formData, setFormData] = useState(null);
+  const [isSaving, setIsSaving] = useState(false);
 
-  const categories = ["Burgers", "Shawarma", "Grillades", "Boissons", "Desserts", "Accompagnements"];
+  const categories = ["Burgers", "Poulet", "Menu Composé", "Supplements"];
 
   const handleAdd = () => {
     const newProduct = {
       name: "",
       description: "",
       price: 0,
-      category: "Burgers",
+      category: "Poulet",
       image: "",
       popular: false,
       badge: "",
@@ -23,8 +24,10 @@ const ProductsManager = ({ products, onSave, onBack }) => {
   };
 
   const handleEdit = (product) => {
-    setFormData({...product});
-    setEditingProduct(product.id);
+    // ✅ Ne pas inclure l'ID dans formData pour éviter les conflits
+    const { id, created_at, ...productData } = product;
+    setFormData(productData);
+    setEditingProduct(id);
   };
 
   const handleCancel = () => {
@@ -38,14 +41,43 @@ const ProductsManager = ({ products, onSave, onBack }) => {
       return;
     }
 
-    await onSave(formData, editingProduct);
-    setFormData(null);
-    setEditingProduct(null);
+    setIsSaving(true);
+    try {
+      // ✅ Ne pas passer l'ID dans les données du produit
+      const productData = {
+        name: formData.name,
+        description: formData.description,
+        price: formData.price,
+        category: formData.category,
+        image: formData.image,
+        popular: formData.popular,
+        badge: formData.badge,
+        stock: formData.stock
+      };
+
+      console.log("💾 Sauvegarde produit:", productData);
+      await onSave(productData, editingProduct);
+      
+      setFormData(null);
+      setEditingProduct(null);
+      alert("✅ Produit enregistré avec succès !");
+    } catch (error) {
+      console.error("❌ Erreur sauvegarde:", error);
+      alert("❌ Erreur lors de l'enregistrement: " + error.message);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleDelete = async (id) => {
     if (window.confirm("Supprimer ce produit ?")) {
-      await onSave(null, id, true); // true = delete
+      try {
+        await onSave(null, id, true); // true = delete
+        alert("✅ Produit supprimé avec succès !");
+      } catch (error) {
+        console.error("❌ Erreur suppression:", error);
+        alert("❌ Erreur lors de la suppression: " + error.message);
+      }
     }
   };
 
@@ -201,14 +233,16 @@ const ProductsManager = ({ products, onSave, onBack }) => {
               <div className="flex gap-3 pt-4">
                 <button
                   onClick={handleSubmit}
-                  className="flex-1 py-3 bg-gradient-to-r from-amber-600 to-amber-700 text-white rounded-xl font-bold hover:from-amber-700 hover:to-amber-800 flex items-center justify-center gap-2"
+                  disabled={isSaving}
+                  className="flex-1 py-3 bg-gradient-to-r from-amber-600 to-amber-700 text-white rounded-xl font-bold hover:from-amber-700 hover:to-amber-800 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   <Save size={20} />
-                  Enregistrer
+                  {isSaving ? "Enregistrement..." : "Enregistrer"}
                 </button>
                 <button
                   onClick={handleCancel}
-                  className="flex-1 py-3 bg-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-300"
+                  disabled={isSaving}
+                  className="flex-1 py-3 bg-gray-200 text-gray-700 rounded-xl font-bold hover:bg-gray-300 disabled:opacity-50"
                 >
                   Annuler
                 </button>
