@@ -72,33 +72,33 @@ const Food = ({ src, alt, Icon = Drumstick, className = "", imgClass = "" }) => 
 /* Banque d'images (poulet, burgers, wraps...) */
 const IMG = {
   bucket:
-    "https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?w=900&q=80&auto=format&fit=crop",
+    "/food/photo-1626645738196-c2a7c87a8f58.jpg",
   chicken:
-    "https://images.unsplash.com/photo-1567620832903-9fc6debc209f?w=800&q=80&auto=format&fit=crop",
+    "/food/photo-1567620832903-9fc6debc209f.jpg",
   burger:
-    "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=800&q=80&auto=format&fit=crop",
+    "/food/photo-1568901346375-23c9450c58cd.jpg",
   wings:
-    "https://images.unsplash.com/photo-1608039755401-742074f0548d?w=800&q=80&auto=format&fit=crop",
+    "/food/photo-1608039755401-742074f0548d.jpg",
   wrap:
-    "https://images.unsplash.com/photo-1626700051175-6818013e1d4f?w=800&q=80&auto=format&fit=crop",
+    "/food/photo-1626700051175-6818013e1d4f.jpg",
   boxmeal:
-    "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&q=80&auto=format&fit=crop",
+    "/food/photo-1513104890138-7c749659a591.jpg",
   combo:
-    "https://images.unsplash.com/photo-1550547660-d9450f859349?w=800&q=80&auto=format&fit=crop",
+    "/food/photo-1550547660-d9450f859349.jpg",
   chef:
-    "https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=900&q=80&auto=format&fit=crop",
+    "/food/photo-1556910103-1c02745aae4d.jpg",
   spices:
-    "https://images.unsplash.com/photo-1596040033229-a9821ebd058d?w=800&q=80&auto=format&fit=crop",
+    "/food/photo-1596040033229-a9821ebd058d.jpg",
   tomato:
-    "https://images.unsplash.com/photo-1546470427-e26264be0b0d?w=600&q=80&auto=format&fit=crop",
+    "/food/photo-1596040033229-a9821ebd058d.jpg",
   kitchen:
-    "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=600&q=80&auto=format&fit=crop",
+    "/food/photo-1517248135467-4c7edcad34c4.jpg",
   friedmade:
-    "https://images.unsplash.com/photo-1610057099443-fde8c4d50f91?w=600&q=80&auto=format&fit=crop",
+    "/food/photo-1610057099443-fde8c4d50f91.jpg",
   store:
-    "https://images.unsplash.com/photo-1552566626-52f8b828add9?w=600&q=80&auto=format&fit=crop",
+    "/food/photo-1552566626-52f8b828add9.jpg",
   rider:
-    "https://images.unsplash.com/photo-1526367790999-0150786686a2?w=900&q=80&auto=format&fit=crop",
+    "/food/photo-1526367790999-0150786686a2.jpg",
 };
 
 /* ------------------------------------------------------------------ */

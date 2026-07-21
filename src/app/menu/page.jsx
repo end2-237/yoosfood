@@ -35,53 +35,53 @@ const CURRENCY = "FCFA";
 /* Images (Unsplash) */
 const IMG = {
   heroBurger:
-    "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=900&q=80&auto=format&fit=crop",
+    "/food/photo-1568901346375-23c9450c58cd.jpg",
   burger1:
-    "https://images.unsplash.com/photo-1550547660-d9450f859349?w=800&q=80&auto=format&fit=crop",
+    "/food/photo-1550547660-d9450f859349.jpg",
   burger2:
-    "https://images.unsplash.com/photo-1586190848861-99aa4a171e90?w=800&q=80&auto=format&fit=crop",
+    "/food/photo-1586190848861-99aa4a171e90.jpg",
   burger3:
-    "https://images.unsplash.com/photo-1610440042657-612c34d95e9f?w=800&q=80&auto=format&fit=crop",
+    "/food/photo-1610440042657-612c34d95e9f.jpg",
   fries:
-    "https://images.unsplash.com/photo-1630384060421-cb20d0e0649d?w=800&q=80&auto=format&fit=crop",
+    "/food/photo-1630384060421-cb20d0e0649d.jpg",
   chickenFingers:
-    "https://images.unsplash.com/photo-1562967914-608f82629710?w=600&q=80&auto=format&fit=crop",
+    "/food/photo-1562967914-608f82629710.jpg",
   nuggets:
-    "https://images.unsplash.com/photo-1619881590738-a111d176d906?w=600&q=80&auto=format&fit=crop",
+    "/food/photo-1619881590738-a111d176d906.jpg",
   broast:
-    "https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?w=600&q=80&auto=format&fit=crop",
+    "/food/photo-1626645738196-c2a7c87a8f58.jpg",
   tempura:
-    "https://images.unsplash.com/photo-1608039755401-742074f0548d?w=600&q=80&auto=format&fit=crop",
+    "/food/photo-1608039755401-742074f0548d.jpg",
   wings:
-    "https://images.unsplash.com/photo-1567620832903-9fc6debc209f?w=600&q=80&auto=format&fit=crop",
+    "/food/photo-1567620832903-9fc6debc209f.jpg",
   grilled:
-    "https://images.unsplash.com/photo-1598103442097-8b74394b95c6?w=600&q=80&auto=format&fit=crop",
+    "/food/photo-1598103442097-8b74394b95c6.jpg",
   pizza1:
-    "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600&q=80&auto=format&fit=crop",
+    "/food/photo-1513104890138-7c749659a591.jpg",
   pizza2:
-    "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&q=80&auto=format&fit=crop",
+    "/food/photo-1565299624946-b28f40a0ae38.jpg",
   pizza3:
-    "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=600&q=80&auto=format&fit=crop",
+    "/food/photo-1574071318508-1cdbab80d002.jpg",
   pizza4:
-    "https://images.unsplash.com/photo-1571407970349-bc81e7e96d47?w=600&q=80&auto=format&fit=crop",
+    "/food/photo-1571407970349-bc81e7e96d47.jpg",
   cola:
-    "https://images.unsplash.com/photo-1554866585-cd94860890b7?w=600&q=80&auto=format&fit=crop",
+    "/food/photo-1554866585-cd94860890b7.jpg",
   juice:
-    "https://images.unsplash.com/photo-1600271886742-f049cd451bba?w=600&q=80&auto=format&fit=crop",
+    "/food/photo-1600271886742-f049cd451bba.jpg",
   coffee:
-    "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=600&q=80&auto=format&fit=crop",
+    "/food/photo-1461023058943-07fcbe16d735.jpg",
   shake:
-    "https://images.unsplash.com/photo-1572490122747-3968b75cc699?w=600&q=80&auto=format&fit=crop",
+    "/food/photo-1572490122747-3968b75cc699.jpg",
   sauce1:
-    "https://images.unsplash.com/photo-1472476443507-c7a5948772fc?w=600&q=80&auto=format&fit=crop",
+    "/food/photo-1472476443507-c7a5948772fc.jpg",
   sauce2:
-    "https://images.unsplash.com/photo-1607013251379-e6eecfffe234?w=600&q=80&auto=format&fit=crop",
+    "/food/photo-1607013251379-e6eecfffe234.jpg",
   combo1:
-    "https://images.unsplash.com/photo-1610440042657-612c34d95e9f?w=600&q=80&auto=format&fit=crop",
+    "/food/photo-1610440042657-612c34d95e9f.jpg",
   combo2:
-    "https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?w=600&q=80&auto=format&fit=crop",
+    "/food/photo-1626645738196-c2a7c87a8f58.jpg",
   rider:
-    "https://images.unsplash.com/photo-1526367790999-0150786686a2?w=900&q=80&auto=format&fit=crop",
+    "/food/photo-1526367790999-0150786686a2.jpg",
 };
 
 /* ================================================================ */
