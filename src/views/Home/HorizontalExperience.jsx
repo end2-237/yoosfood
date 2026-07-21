@@ -222,11 +222,12 @@ const PanelHero = () => {
 
   return (
     <div className="relative h-full w-full overflow-hidden bg-gradient-to-br from-[#3a0505] via-[#7a0d0d] to-[#4a0606]">
-      {/* fond : vidéos TikTok @12yossfood */}
-      <div className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center overflow-hidden opacity-30">
-        <TikTokEmbeds className="flex h-full max-h-full items-center justify-center gap-3 px-2" />
+      {/* fond : vidéos TikTok @12yossfood (bien visibles) */}
+      <div className="absolute inset-0 z-0 flex items-center justify-center overflow-hidden">
+        <TikTokEmbeds className="flex h-full max-h-full items-center justify-center gap-4 px-2" />
       </div>
-      <div className="pointer-events-none absolute inset-0 z-0 bg-gradient-to-br from-[#3a0505]/85 via-[#7a0d0d]/80 to-[#4a0606]/90" />
+      {/* voile dégradé : sombre à gauche (texte lisible), clair à droite (vidéos visibles) */}
+      <div className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-r from-[#2a0303]/95 via-[#3a0505]/45 to-transparent" />
 
       <div className="pointer-events-none absolute left-1/2 top-1/3 z-0 h-[600px] w-[600px] max-w-full -translate-x-1/2 rounded-full bg-red-500/20 blur-[120px]" />
 
