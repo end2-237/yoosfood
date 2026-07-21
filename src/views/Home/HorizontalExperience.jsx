@@ -118,7 +118,7 @@ const NavBar = ({ current, goTo }) => {
         onClick={() => goTo(0)}
         className="pointer-events-auto flex shrink-0 items-center gap-2"
       >
-        <img src={logo} alt="YoosFood" className="h-14 w-14 object-contain drop-shadow-lg md:h-16 md:w-16" />
+        <img src={logo} alt="YoosFood" className="h-16 w-16 object-contain drop-shadow-lg md:h-20 md:w-20" />
         <div className="leading-none">
           <p className="text-lg font-black tracking-tight text-white md:text-xl">YoosFood</p>
           <p className="text-[9px] font-semibold tracking-[0.25em] text-red-300 md:text-[10px]">

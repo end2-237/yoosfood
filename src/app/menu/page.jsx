@@ -49,7 +49,7 @@ const IMG = {
   nuggets:
     "https://images.unsplash.com/photo-1619881590738-a111d176d906?w=600&q=80&auto=format&fit=crop",
   broast:
-    "https://images.unsplash.com/photo-1626082927389-6cd097cee6a6?w=600&q=80&auto=format&fit=crop",
+    "https://images.unsplash.com/photo-1626645738196-c2a7c87a8f58?w=600&q=80&auto=format&fit=crop",
   tempura:
     "https://images.unsplash.com/photo-1608039755401-742074f0548d?w=600&q=80&auto=format&fit=crop",
   wings:
@@ -200,7 +200,7 @@ function Header() {
     <header className="sticky top-0 z-50 border-b border-black/5 bg-[#fff8ef]/95 backdrop-blur">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-2.5 md:px-6">
         <Link href="/" className="flex shrink-0 items-center gap-2">
-          <img src={logo} alt="YoosFood" className="h-14 w-14 object-contain md:h-16 md:w-16" />
+          <img src={logo} alt="YoosFood" className="h-16 w-16 object-contain md:h-20 md:w-20" />
           <span className="text-2xl font-black tracking-tight text-red-600">YoosFood</span>
         </Link>
 
