@@ -118,13 +118,7 @@ const NavBar = ({ current, goTo }) => {
         onClick={() => goTo(0)}
         className="pointer-events-auto flex shrink-0 items-center gap-2"
       >
-        <img src={logo} alt="YoosFood" className="h-16 w-16 object-contain drop-shadow-lg md:h-20 md:w-20" />
-        <div className="leading-none">
-          <p className="text-lg font-black tracking-tight text-white md:text-xl">YoosFood</p>
-          <p className="text-[9px] font-semibold tracking-[0.25em] text-red-300 md:text-[10px]">
-            CAMEROUN
-          </p>
-        </div>
+        <img src={logo} alt="YossFood" className="h-32 w-32 object-contain drop-shadow-lg md:h-40 md:w-40" />
       </button>
 
       {/* Liens centraux */}
@@ -190,7 +184,7 @@ const Kicker = ({ children }) => (
    verticalement sur les petits écrans (plus rien n'est coupé). */
 const PanelShell = ({ children, className = "" }) => (
   <div
-    className={`hide-scroll relative z-10 flex h-full flex-col overflow-y-auto px-5 pb-24 pt-28 md:px-10 ${className}`}
+    className={`hide-scroll relative z-10 flex h-full flex-col overflow-y-auto px-5 pb-24 pt-36 md:px-10 md:pt-44 ${className}`}
   >
     <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col justify-start lg:justify-center">
       {children}
@@ -228,7 +222,13 @@ const PanelHero = () => {
 
   return (
     <div className="relative h-full w-full overflow-hidden bg-gradient-to-br from-[#3a0505] via-[#7a0d0d] to-[#4a0606]">
-      <div className="pointer-events-none absolute left-1/2 top-1/3 h-[600px] w-[600px] max-w-full -translate-x-1/2 rounded-full bg-red-500/20 blur-[120px]" />
+      {/* fond : vidéos TikTok @12yossfood */}
+      <div className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center overflow-hidden opacity-30">
+        <TikTokEmbeds className="flex h-full max-h-full items-center justify-center gap-3 px-2" />
+      </div>
+      <div className="pointer-events-none absolute inset-0 z-0 bg-gradient-to-br from-[#3a0505]/85 via-[#7a0d0d]/80 to-[#4a0606]/90" />
+
+      <div className="pointer-events-none absolute left-1/2 top-1/3 z-0 h-[600px] w-[600px] max-w-full -translate-x-1/2 rounded-full bg-red-500/20 blur-[120px]" />
 
       <PanelShell>
         <div className="grid grid-cols-12 gap-6">
@@ -936,6 +936,45 @@ const Phone = ({ children, tilt = "", small, big }) => (
 );
 
 /* ================================================================== */
+/*  VIDÉOS TIKTOK (fond du 1er panneau)                                */
+/* ================================================================== */
+const TIKTOKS = ["7531761938645126421", "7500251493874896148", "7623476718837337364"];
+
+const TikTokEmbeds = ({ className = "grid gap-4 sm:grid-cols-2 lg:grid-cols-3" }) => {
+  useEffect(() => {
+    if (document.getElementById("tiktok-embed-script")) {
+      if (window.tiktokEmbed?.lib?.render) window.tiktokEmbed.lib.render();
+      return;
+    }
+    const s = document.createElement("script");
+    s.id = "tiktok-embed-script";
+    s.src = "https://www.tiktok.com/embed.js";
+    s.async = true;
+    document.body.appendChild(s);
+  }, []);
+
+  return (
+    <div className={className}>
+      {TIKTOKS.map((id) => (
+        <blockquote
+          key={id}
+          className="tiktok-embed"
+          cite={`https://www.tiktok.com/@12yossfood/video/${id}`}
+          data-video-id={id}
+          style={{ maxWidth: 605, minWidth: 280 }}
+        >
+          <section>
+            <a target="_blank" rel="noreferrer" href="https://www.tiktok.com/@12yossfood">
+              @12yossfood
+            </a>
+          </section>
+        </blockquote>
+      ))}
+    </div>
+  );
+};
+
+/* ================================================================== */
 /*  CONTENEUR SLIDER HORIZONTAL                                        */
 /* ================================================================== */
 const HorizontalExperience = () => {
@@ -1021,7 +1060,7 @@ const HorizontalExperience = () => {
       {/* pagination + progression */}
       <div className="absolute bottom-5 left-1/2 z-30 flex -translate-x-1/2 items-center gap-4">
         <div className="flex items-center gap-2 rounded-full border border-white/15 bg-black/50 px-4 py-2 backdrop-blur">
-          {["Accueil", "Menu", "Histoire", "App"].map((label, i) => (
+          {["Accueil", "Menu", "Histoire", "App"].map((label, i, arr) => (
             <button key={label} onClick={() => goTo(i)} className="flex items-center gap-2">
               <span className={`text-xs font-semibold transition ${current === i ? "text-white" : "text-gray-500"}`}>
                 {String(i + 1).padStart(2, "0")}
@@ -1029,7 +1068,7 @@ const HorizontalExperience = () => {
               <span className={`hidden text-xs font-semibold transition sm:inline ${current === i ? "text-white" : "text-gray-500"}`}>
                 {label}
               </span>
-              {i < 3 && <span className="text-gray-600">·</span>}
+              {i < arr.length - 1 && <span className="text-gray-600">·</span>}
             </button>
           ))}
         </div>

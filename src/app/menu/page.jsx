@@ -82,6 +82,8 @@ const IMG = {
     "/food/photo-1626645738196-c2a7c87a8f58.jpg",
   rider:
     "/food/photo-1526367790999-0150786686a2.jpg",
+  ingredients:
+    "/food/photo-1571091718767-18b5b1457add.jpg",
 };
 
 /* ================================================================ */
@@ -279,9 +281,8 @@ function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-black/5 bg-[#fff8ef]/95 backdrop-blur">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-2.5 md:px-6">
-        <Link href="/" className="flex shrink-0 items-center gap-2">
-          <img src={logo} alt="YoosFood" className="h-16 w-16 object-contain md:h-20 md:w-20" />
-          <span className="text-2xl font-black tracking-tight text-red-600">YoosFood</span>
+        <Link href="/" className="flex shrink-0 items-center">
+          <img src={logo} alt="YossFood" className="h-32 w-32 object-contain md:h-40 md:w-40" />
         </Link>
 
         <nav className="hidden items-center gap-7 lg:flex">
@@ -560,46 +561,50 @@ function Favourites() {
 /*  PREMIUM — burger éclaté avec légendes d'ingrédients            */
 /* ================================================================ */
 function ExplodedBurger() {
-  // couches empilées et espacées (effet "éclaté" comme le design)
-  const layers = [
-    { cls: "h-11 w-52 rounded-t-full bg-gradient-to-b from-amber-300 via-amber-400 to-amber-500 shadow-lg", sesame: true }, // pain haut
-    { cls: "h-4 w-64 rounded-full bg-gradient-to-b from-green-400 to-green-600" }, // salade
-    { cls: "h-4 w-56 rounded-full bg-gradient-to-b from-red-400 to-red-600" }, // tomate
-    { cls: "h-4 w-60 rotate-2 rounded-md bg-gradient-to-b from-yellow-300 to-yellow-500", tag: "cheese" }, // cheddar
-    { cls: "h-8 w-52 rounded-full bg-gradient-to-b from-[#8a5636] via-[#6b3f22] to-[#4a2c16]", tag: "veg" }, // steak
-    { cls: "h-4 w-56 rounded-full bg-gradient-to-b from-fuchsia-300 to-purple-500" }, // oignon
-    { cls: "h-4 w-60 rounded-full bg-gradient-to-b from-green-400 to-green-600" }, // salade 2
-    { cls: "h-10 w-52 rounded-b-full bg-gradient-to-b from-amber-400 via-amber-500 to-amber-600 shadow-lg" }, // pain bas
+  // vraie photo de burger avec légendes d'ingrédients qui pointent dessus
+  const points = [
+    { t: "Pain Brioché Doré", side: "left", top: "14%" },
+    { t: "Cheddar Premium", side: "right", top: "40%" },
+    { t: "Steak Grillé Charbon", side: "left", top: "62%" },
+    { t: "Légumes Frais", side: "right", top: "80%" },
   ];
   return (
-    <div className="relative mx-auto w-full max-w-sm">
-      <div className="flex flex-col items-center gap-2 py-6">
-        {layers.map((l, i) => (
-          <div key={i} className={`relative shadow-md ${l.cls}`}>
-            {l.sesame && (
-              <>
-                <span className="absolute left-1/3 top-2 h-1 w-2 rounded-full bg-amber-100" />
-                <span className="absolute left-1/2 top-3 h-1 w-2 rounded-full bg-amber-100" />
-                <span className="absolute right-1/3 top-2 h-1 w-2 rounded-full bg-amber-100" />
-              </>
-            )}
-            {/* légende Cheddar */}
-            {l.tag === "cheese" && (
-              <span className="absolute left-full top-1/2 flex -translate-y-1/2 items-center">
-                <span className="h-px w-10 border-t-2 border-dashed border-red-400" />
-                <span className="grid h-6 w-6 place-items-center rounded-full bg-red-600 text-white shadow"><Plus size={13} /></span>
-                <span className="ml-2 whitespace-nowrap text-xs font-black text-gray-800">Cheddar Premium</span>
-              </span>
-            )}
-            {/* légende Légumes */}
-            {l.tag === "veg" && (
-              <span className="absolute right-full top-1/2 flex -translate-y-1/2 flex-row-reverse items-center">
-                <span className="h-px w-10 border-t-2 border-dashed border-red-400" />
-                <span className="grid h-6 w-6 place-items-center rounded-full bg-red-600 text-white shadow"><Plus size={13} /></span>
-                <span className="mr-2 whitespace-nowrap text-xs font-black text-gray-800">Légumes du Jardin Frais</span>
-              </span>
-            )}
-          </div>
+    <div className="relative mx-auto w-full max-w-md py-4">
+      <div className="relative mx-auto aspect-square w-[74%]">
+        <Dish
+          src={IMG.ingredients}
+          alt="Signature Beef Burger"
+          Icon={Beef}
+          className="h-full w-full rounded-full object-cover shadow-2xl ring-8 ring-white"
+          imgClass="rounded-full object-cover"
+        />
+      </div>
+
+      {/* légendes (tablette / desktop) */}
+      {points.map((p) => (
+        <div
+          key={p.t}
+          className={`absolute hidden items-center gap-2 md:flex ${
+            p.side === "left" ? "left-0 flex-row" : "right-0 flex-row-reverse"
+          }`}
+          style={{ top: p.top }}
+        >
+          <span className="whitespace-nowrap rounded-full bg-white px-3 py-1 text-xs font-black text-gray-800 shadow-md">
+            {p.t}
+          </span>
+          <span className="h-px w-8 border-t-2 border-dashed border-red-400" />
+          <span className="grid h-6 w-6 place-items-center rounded-full bg-red-600 text-white shadow">
+            <Plus size={13} />
+          </span>
+        </div>
+      ))}
+
+      {/* liste (mobile) */}
+      <div className="mt-5 flex flex-wrap justify-center gap-2 md:hidden">
+        {points.map((p) => (
+          <span key={p.t} className="flex items-center gap-1 rounded-full bg-white px-3 py-1 text-xs font-bold text-gray-800 shadow">
+            <span className="h-2 w-2 rounded-full bg-red-600" /> {p.t}
+          </span>
         ))}
       </div>
     </div>
@@ -716,9 +721,8 @@ function Footer() {
     <footer id="contact" className="bg-gray-900 text-gray-300">
       <div className="mx-auto grid max-w-7xl gap-8 px-4 py-12 md:grid-cols-4 md:px-6">
         <div>
-          <div className="flex items-center gap-2">
-            <img src={logo} alt="YoosFood" className="h-14 w-14 object-contain" />
-            <span className="text-2xl font-black text-red-500">YoosFood</span>
+          <div className="flex items-center">
+            <img src={logo} alt="YossFood" className="h-28 w-28 object-contain" />
           </div>
           <p className="mt-3 text-sm text-gray-400">
             L'Excellence Culinaire à Votre Service. Burgers, poulet & grillades à Douala.
