@@ -112,7 +112,7 @@ const NavBar = ({ current, goTo }) => {
     { label: "App Mobile", panel: 3 },
   ];
   return (
-    <header className="pointer-events-none absolute inset-x-0 top-0 z-40 flex items-center justify-between gap-3 px-4 py-3 md:px-10 md:py-4">
+    <header className="pointer-events-none absolute inset-x-0 top-0 z-40 flex items-start justify-between gap-3 px-4 py-2 md:px-10 md:py-3">
       {/* Logo */}
       <button
         onClick={() => goTo(0)}
@@ -222,9 +222,9 @@ const PanelHero = () => {
 
   return (
     <div className="relative h-full w-full overflow-hidden bg-gradient-to-br from-[#3a0505] via-[#7a0d0d] to-[#4a0606]">
-      {/* fond : vidéos TikTok @12yossfood (bien visibles) */}
-      <div className="absolute inset-0 z-0 flex items-center justify-center overflow-hidden">
-        <TikTokEmbeds className="flex h-full max-h-full items-center justify-center gap-4 px-2" />
+      {/* fond : carrousel infini de vidéos TikTok @12yossfood (autoplay muet) */}
+      <div className="absolute inset-0 z-0 overflow-hidden">
+        <TikTokMarquee className="h-full w-full" />
       </div>
       {/* voile dégradé : sombre à gauche (texte lisible), clair à droite (vidéos visibles) */}
       <div className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-r from-[#2a0303]/95 via-[#3a0505]/45 to-transparent" />
@@ -937,40 +937,31 @@ const Phone = ({ children, tilt = "", small, big }) => (
 );
 
 /* ================================================================== */
-/*  VIDÉOS TIKTOK (fond du 1er panneau)                                */
+/*  VIDÉOS TIKTOK (fond du 1er panneau) — lecture auto en chaîne       */
 /* ================================================================== */
 const TIKTOKS = ["7531761938645126421", "7500251493874896148", "7623476718837337364"];
 
-const TikTokEmbeds = ({ className = "grid gap-4 sm:grid-cols-2 lg:grid-cols-3" }) => {
-  useEffect(() => {
-    if (document.getElementById("tiktok-embed-script")) {
-      if (window.tiktokEmbed?.lib?.render) window.tiktokEmbed.lib.render();
-      return;
-    }
-    const s = document.createElement("script");
-    s.id = "tiktok-embed-script";
-    s.src = "https://www.tiktok.com/embed.js";
-    s.async = true;
-    document.body.appendChild(s);
-  }, []);
-
+// Carrousel infini (marquee) : les vidéos défilent lentement en continu et
+// se lancent automatiquement en muet (autoplay autorisé par les navigateurs).
+// Le jeu est dupliqué pour une boucle sans couture.
+const TikTokMarquee = ({ className = "" }) => {
+  const items = [...TIKTOKS, ...TIKTOKS];
   return (
-    <div className={className}>
-      {TIKTOKS.map((id) => (
-        <blockquote
-          key={id}
-          className="tiktok-embed"
-          cite={`https://www.tiktok.com/@12yossfood/video/${id}`}
-          data-video-id={id}
-          style={{ maxWidth: 605, minWidth: 280 }}
-        >
-          <section>
-            <a target="_blank" rel="noreferrer" href="https://www.tiktok.com/@12yossfood">
-              @12yossfood
-            </a>
-          </section>
-        </blockquote>
-      ))}
+    <div className={`overflow-hidden ${className}`}>
+      <div className="tt-marquee flex h-full w-max items-center">
+        {items.map((id, i) => (
+          <div key={i} className="h-full shrink-0 px-2" style={{ width: "300px" }}>
+            <iframe
+              src={`https://www.tiktok.com/player/v1/${id}?autoplay=1&muted=1&loop=1&controls=0&description=0&music_info=0&rel=0`}
+              title={`Vidéo TikTok @12yossfood ${(i % TIKTOKS.length) + 1}`}
+              allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+              allowFullScreen
+              className="h-full w-full rounded-xl border-0"
+              loading="lazy"
+            />
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
@@ -1087,6 +1078,8 @@ const HorizontalExperience = () => {
         .script { font-family: 'Brush Script MT', cursive; }
         .hide-scroll { scrollbar-width: none; -ms-overflow-style: none; }
         .hide-scroll::-webkit-scrollbar { display: none; }
+        @keyframes ttMarquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+        .tt-marquee { animation: ttMarquee 60s linear infinite; }
       `}</style>
     </div>
   );
