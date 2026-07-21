@@ -512,8 +512,8 @@ function Favourites() {
                   src={c.thumb}
                   alt={c.label}
                   Icon={c.Icon}
-                  className="h-12 w-12 rounded-full object-cover ring-2 ring-white"
-                  imgClass="rounded-full object-cover"
+                  className="h-14 w-14 rounded-xl object-cover"
+                  imgClass="rounded-xl object-cover"
                 />
                 <span className="text-xs font-bold">{c.label}</span>
               </button>
@@ -526,27 +526,28 @@ function Favourites() {
           {current.items.map((item) => (
             <article
               key={item.name}
-              className="flex items-center gap-4 rounded-2xl border border-gray-100 bg-[#fff8ef] p-3 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
+              className="flex items-center gap-4 rounded-2xl border-2 border-dashed border-gray-300 bg-white p-3 transition hover:border-red-400 hover:shadow-md"
             >
               <Dish
                 src={item.img}
                 alt={item.name}
                 Icon={item.Icon}
-                className="h-24 w-24 shrink-0 rounded-full object-cover ring-4 ring-white sm:h-28 sm:w-28"
-                imgClass="rounded-full object-cover"
+                className="h-20 w-20 shrink-0 rounded-xl object-cover sm:h-24 sm:w-24"
+                imgClass="rounded-xl object-cover"
               />
               <div className="min-w-0 flex-1">
-                <h3 className="truncate text-lg font-black text-gray-900">{item.name}</h3>
+                <h3 className="truncate text-base font-black text-gray-900">{item.name}</h3>
                 <p className="mt-0.5 line-clamp-2 text-sm text-gray-500">{item.desc}</p>
-                <div className="mt-2 flex items-center justify-between">
-                  <p className="text-sm font-black text-gray-900">
-                    Prix : <span className="text-red-600">{item.price} {CURRENCY}</span>
-                  </p>
-                  <button className="flex items-center gap-1 rounded-full bg-gray-900 px-3 py-1.5 text-xs font-bold text-white transition hover:bg-red-600">
-                    <Plus size={13} /> Ajouter
-                  </button>
-                </div>
+                <p className="mt-2 text-sm font-black text-gray-900">
+                  Prix : <span className="text-red-600">{item.price} {CURRENCY}</span>
+                </p>
               </div>
+              <button
+                aria-label="Ajouter au panier"
+                className="grid h-9 w-9 shrink-0 place-items-center self-center rounded-full bg-red-600 text-white transition hover:bg-red-700"
+              >
+                <Plus size={16} />
+              </button>
             </article>
           ))}
         </div>
@@ -561,13 +562,14 @@ function Favourites() {
 function ExplodedBurger() {
   // couches empilées et espacées (effet "éclaté" comme le design)
   const layers = [
-    { cls: "h-8 w-52 rounded-t-[100%] bg-gradient-to-b from-amber-300 to-amber-400", sesame: true }, // pain haut
-    { cls: "h-3 w-60 rounded-full bg-green-500" }, // salade
-    { cls: "h-3 w-56 rounded-full bg-red-500" }, // tomate
-    { cls: "h-3 w-60 rotate-2 rounded-sm bg-yellow-400", tag: "cheese" }, // cheddar
-    { cls: "h-6 w-52 rounded-full bg-gradient-to-b from-[#7a4a2b] to-[#5a3520]", tag: "veg" }, // steak
-    { cls: "h-3 w-56 rounded-full bg-green-500" }, // salade 2
-    { cls: "h-6 w-52 rounded-b-[100%] bg-gradient-to-b from-amber-400 to-amber-500" }, // pain bas
+    { cls: "h-11 w-52 rounded-t-full bg-gradient-to-b from-amber-300 via-amber-400 to-amber-500 shadow-lg", sesame: true }, // pain haut
+    { cls: "h-4 w-64 rounded-full bg-gradient-to-b from-green-400 to-green-600" }, // salade
+    { cls: "h-4 w-56 rounded-full bg-gradient-to-b from-red-400 to-red-600" }, // tomate
+    { cls: "h-4 w-60 rotate-2 rounded-md bg-gradient-to-b from-yellow-300 to-yellow-500", tag: "cheese" }, // cheddar
+    { cls: "h-8 w-52 rounded-full bg-gradient-to-b from-[#8a5636] via-[#6b3f22] to-[#4a2c16]", tag: "veg" }, // steak
+    { cls: "h-4 w-56 rounded-full bg-gradient-to-b from-fuchsia-300 to-purple-500" }, // oignon
+    { cls: "h-4 w-60 rounded-full bg-gradient-to-b from-green-400 to-green-600" }, // salade 2
+    { cls: "h-10 w-52 rounded-b-full bg-gradient-to-b from-amber-400 via-amber-500 to-amber-600 shadow-lg" }, // pain bas
   ];
   return (
     <div className="relative mx-auto w-full max-w-sm">
