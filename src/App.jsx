@@ -8,6 +8,7 @@ import AdminDashboard from "./views/AdminDasboard";
 import ProductsManager from "./views/ProductsManage";
 import OrdersManager from "./views/OrderManager";
 import ReviewsManager from "./views/ReviewManager";
+import Loader from "./components/Loader";
 
 import { SupabaseService } from "./services/SupabaseServices";
 
@@ -65,6 +66,9 @@ const YossFoodApp = () => {
   // Charger les données au démarrage
   useEffect(() => {
     loadAllData();
+    // Entrée rapide : ne jamais bloquer l'écran de chargement trop longtemps.
+    const t = setTimeout(() => setLoading(false), 800);
+    return () => clearTimeout(t);
   }, []);
 
   const checkSession = async () => {
@@ -229,20 +233,7 @@ const YossFoodApp = () => {
 
   // Affichage du chargement
   if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-amber-900 via-amber-800 to-orange-900 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center text-amber-900 font-bold text-3xl mx-auto mb-6 shadow-2xl animate-pulse">
-            YF
-          </div>
-          <div className="flex gap-2 justify-center">
-            <div className="w-3 h-3 bg-white rounded-full animate-bounce" style={{animationDelay: "0s"}}></div>
-            <div className="w-3 h-3 bg-white rounded-full animate-bounce" style={{animationDelay: "0.2s"}}></div>
-            <div className="w-3 h-3 bg-white rounded-full animate-bounce" style={{animationDelay: "0.4s"}}></div>
-          </div>
-        </div>
-      </div>
-    );
+    return <Loader />;
   }
 
   // Login admin
