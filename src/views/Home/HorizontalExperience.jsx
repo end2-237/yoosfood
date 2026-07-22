@@ -102,6 +102,77 @@ const IMG = {
     "/food/photo-1552566626-52f8b828add9.jpg",
   rider:
     "/food/photo-1526367790999-0150786686a2.jpg",
+  fries: "/food/photo-1630384060421-cb20d0e0649d.jpg",
+  nuggets: "/food/photo-1619881590738-a111d176d906.jpg",
+  pizza: "/food/photo-1565299624946-b28f40a0ae38.jpg",
+  cola: "/food/photo-1554866585-cd94860890b7.jpg",
+  juice: "/food/photo-1600271886742-f049cd451bba.jpg",
+  shake: "/food/photo-1572490122747-3968b75cc699.jpg",
+  sauce: "/food/photo-1472476443507-c7a5948772fc.jpg",
+};
+
+/* Catalogue de produits par catégorie (panneaux 1 & 2) */
+const PRODUCTS_BY_CAT = {
+  "Pour Vous": [
+    { tag: "HOT", meta: "670 kcal", name: "Menu Burger Zinger", price: "2 900 F", img: IMG.burger, Icon: Beef, popular: true },
+    { tag: "POPULAIRE", meta: "3 Pièces", name: "Poulet 3 Pièces", price: "3 500 F", img: IMG.chicken, Icon: Drumstick },
+    { tag: "NOUVEAU", meta: "8 Pièces", name: "Bucket Extreme", price: "8 900 F", img: IMG.bucket, Icon: Drumstick },
+    { tag: "", meta: "Wrap", name: "Menu Twister", price: "2 500 F", img: IMG.wrap, Icon: Sandwich },
+  ],
+  Buckets: [
+    { tag: "FAMILLE", meta: "8 Pièces", name: "Bucket Familial", price: "8 900 F", img: IMG.bucket, Icon: Drumstick, popular: true },
+    { tag: "XL", meta: "12 Pièces", name: "Bucket Extreme", price: "12 900 F", img: IMG.bucket, Icon: Drumstick },
+    { tag: "", meta: "6 Ailes", name: "Bucket Ailes", price: "3 400 F", img: IMG.wings, Icon: Drumstick },
+    { tag: "DUO", meta: "6 Pièces", name: "Bucket Duo", price: "6 500 F", img: IMG.friedmade, Icon: Drumstick },
+  ],
+  Burgers: [
+    { tag: "HOT", meta: "670 kcal", name: "Burger Zinger", price: "2 900 F", img: IMG.burger, Icon: Beef, popular: true },
+    { tag: "", meta: "Double", name: "Double Cheese", price: "3 900 F", img: IMG.combo, Icon: Beef },
+    { tag: "", meta: "Crispy", name: "Crispy Chicken", price: "3 200 F", img: IMG.chicken, Icon: Drumstick },
+    { tag: "ÉPICÉ", meta: "Spicy", name: "Spicy BBQ", price: "3 500 F", img: IMG.burger, Icon: Flame },
+  ],
+  Menus: [
+    { tag: "", meta: "950 kcal", name: "Menu Box Crispy", price: "3 900 F", img: IMG.boxmeal, Icon: Utensils },
+    { tag: "", meta: "Wrap", name: "Menu Twister", price: "2 500 F", img: IMG.wrap, Icon: Sandwich },
+    { tag: "HOT", meta: "Zinger", name: "Menu Zinger", price: "3 250 F", img: IMG.burger, Icon: Beef, popular: true },
+    { tag: "KIDS", meta: "Enfant", name: "Menu Enfant", price: "2 200 F", img: IMG.nuggets, Icon: Cookie },
+  ],
+  Accompagnements: [
+    { tag: "", meta: "Portion", name: "Frites Maison", price: "1 200 F", img: IMG.fries, Icon: Salad },
+    { tag: "POPULAIRE", meta: "9 Pièces", name: "Nuggets", price: "2 500 F", img: IMG.nuggets, Icon: Drumstick, popular: true },
+    { tag: "", meta: "6 Ailes", name: "Ailes de Poulet", price: "3 400 F", img: IMG.wings, Icon: Drumstick },
+    { tag: "", meta: "Onion", name: "Onion Rings", price: "1 500 F", img: IMG.fries, Icon: Salad },
+  ],
+  Desserts: [
+    { tag: "", meta: "Glacé", name: "Milkshake", price: "2 000 F", img: IMG.shake, Icon: IceCream, popular: true },
+    { tag: "", meta: "Sundae", name: "Sundae Choco", price: "1 500 F", img: IMG.shake, Icon: IceCream },
+    { tag: "", meta: "Maison", name: "Cookie", price: "800 F", img: IMG.boxmeal, Icon: Cookie },
+    { tag: "", meta: "Moelleux", name: "Donut", price: "1 000 F", img: IMG.boxmeal, Icon: Cookie },
+  ],
+  Boissons: [
+    { tag: "", meta: "33cl", name: "Soda Glacé", price: "800 F", img: IMG.cola, Icon: CupSoda },
+    { tag: "FRAIS", meta: "Pressé", name: "Jus d'Orange", price: "1 000 F", img: IMG.juice, Icon: CupSoda, popular: true },
+    { tag: "", meta: "Glacé", name: "Iced Coffee", price: "1 500 F", img: IMG.juice, Icon: CupSoda },
+    { tag: "", meta: "50cl", name: "Eau Minérale", price: "500 F", img: IMG.cola, Icon: CupSoda },
+  ],
+  Sauces: [
+    { tag: "", meta: "Maison", name: "Sauce BBQ", price: "500 F", img: IMG.sauce, Icon: Salad },
+    { tag: "", meta: "Crémeuse", name: "Garlic Mayo", price: "500 F", img: IMG.sauce, Icon: Salad },
+    { tag: "", meta: "Fondue", name: "Cheddar", price: "700 F", img: IMG.sauce, Icon: Salad },
+    { tag: "FORT", meta: "Piment", name: "Hot Chili", price: "700 F", img: IMG.sauce, Icon: Flame },
+  ],
+  Wraps: [
+    { tag: "", meta: "Poulet", name: "Wrap Twister", price: "2 500 F", img: IMG.wrap, Icon: Sandwich, popular: true },
+    { tag: "", meta: "Crispy", name: "Wrap Crispy", price: "2 700 F", img: IMG.wrap, Icon: Sandwich },
+    { tag: "ÉPICÉ", meta: "Spicy", name: "Wrap Spicy", price: "2 800 F", img: IMG.wrap, Icon: Flame },
+    { tag: "", meta: "Veggie", name: "Wrap Veggie", price: "2 300 F", img: IMG.wrap, Icon: Salad },
+  ],
+  "Menus Enfant": [
+    { tag: "KIDS", meta: "Nuggets", name: "Menu Nuggets", price: "2 200 F", img: IMG.nuggets, Icon: Cookie, popular: true },
+    { tag: "", meta: "Mini", name: "Mini Burger", price: "2 000 F", img: IMG.burger, Icon: Beef },
+    { tag: "", meta: "+ Jouet", name: "Happy Kids", price: "2 500 F", img: IMG.boxmeal, Icon: Cookie },
+    { tag: "", meta: "Frites", name: "Kids Frites", price: "1 500 F", img: IMG.fries, Icon: Salad },
+  ],
 };
 
 /* ------------------------------------------------------------------ */
@@ -226,12 +297,17 @@ const PanelHero = () => {
     { label: "Boissons", icon: CupSoda },
     { label: "Sauces", icon: Cookie },
   ];
-  const products = [
-    { tag: "HOT", name: "Menu Burger Zinger", price: "2 900 F", img: IMG.burger, Icon: Beef },
-    { tag: "POPULAIRE", name: "Poulet 3 Pièces", price: "3 500 F", img: IMG.chicken, Icon: Drumstick },
-    { tag: "NOUVEAU", name: "Bucket Extreme", price: "8 900 F", img: IMG.bucket, Icon: Drumstick },
-    { tag: "", name: "Menu Twister", price: "2 500 F", img: IMG.wrap, Icon: Sandwich },
-  ];
+  const [cat, setCat] = useState(0);
+  const [anim, setAnim] = useState("cat-in");
+  const switchCat = (i) => {
+    if (i === cat) return;
+    setAnim("cat-out");
+    setTimeout(() => {
+      setCat(i);
+      setAnim("cat-in");
+    }, 260);
+  };
+  const products = PRODUCTS_BY_CAT[cats[cat].label] || [];
 
   return (
     <div className="relative h-full w-full overflow-hidden bg-gradient-to-br from-[#3a0505] via-[#7a0d0d] to-[#4a0606]">
@@ -356,8 +432,9 @@ const PanelHero = () => {
               return (
                 <button
                   key={c.label}
+                  onClick={() => switchCat(i)}
                   className={`flex shrink-0 items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-semibold transition ${
-                    i === 0
+                    i === cat
                       ? "bg-gradient-to-r from-red-600 to-red-500 text-white"
                       : "text-gray-300 hover:text-white"
                   }`}
@@ -368,7 +445,7 @@ const PanelHero = () => {
               );
             })}
           </div>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4">
+          <div className={`grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4 ${anim}`}>
             {products.map((p) => (
               <div
                 key={p.name}
@@ -478,15 +555,8 @@ const HeartsRain = () => (
 /* ================================================================== */
 const PanelMenu = () => {
   const { addItem } = useCart();
-  const featured = [
-    { name: "Menu Burger Zinger", meta: "670 kcal", price: "2 900 F", img: IMG.burger, Icon: Beef, popular: true },
-    { name: "Bucket Familial", meta: "8 Pièces", price: "8 900 F", img: IMG.bucket, Icon: Drumstick },
-    { name: "Ailes de Poulet", meta: "6 Pièces", price: "3 400 F", img: IMG.wings, Icon: Drumstick, popular: true },
-    { name: "Menu Box Crispy", meta: "950 kcal", price: "3 900 F", img: IMG.boxmeal, Icon: Utensils },
-    { name: "Offres Combo", meta: "2 Personnes", price: "9 900 F", img: IMG.combo, Icon: Sandwich },
-  ];
   const cats = [
-    { label: "Burgers", Icon: Beef, active: true },
+    { label: "Burgers", Icon: Beef },
     { label: "Buckets", Icon: Drumstick },
     { label: "Wraps", Icon: Sandwich },
     { label: "Boissons", Icon: CupSoda },
@@ -494,6 +564,17 @@ const PanelMenu = () => {
     { label: "Menus Enfant", Icon: Cookie },
     { label: "Sauces", Icon: Salad },
   ];
+  const [cat, setCat] = useState(0);
+  const [anim, setAnim] = useState("cat-in");
+  const switchCat = (i) => {
+    if (i === cat) return;
+    setAnim("cat-out");
+    setTimeout(() => {
+      setCat(i);
+      setAnim("cat-in");
+    }, 260);
+  };
+  const featured = PRODUCTS_BY_CAT[cats[cat].label] || [];
   const sauces = [
     { c: "bg-red-500", n: "Piquante" },
     { c: "bg-amber-400", n: "Miel" },
@@ -530,7 +611,7 @@ const PanelMenu = () => {
             <p className="mb-3 text-xs font-bold tracking-[0.2em] text-gray-400">
               MENUS VEDETTES —
             </p>
-            <div className="hide-scroll flex gap-3 overflow-x-auto pb-2">
+            <div className={`hide-scroll flex gap-3 overflow-x-auto pb-2 ${anim}`}>
               {featured.map((f, i) => (
                 <div
                   key={f.name}
@@ -569,13 +650,14 @@ const PanelMenu = () => {
 
         {/* catégories */}
         <div className="hide-scroll my-4 flex gap-2 overflow-x-auto">
-          {cats.map((c) => {
+          {cats.map((c, i) => {
             const Icon = c.Icon;
             return (
               <button
                 key={c.label}
+                onClick={() => switchCat(i)}
                 className={`flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition ${
-                  c.active
+                  i === cat
                     ? "bg-gradient-to-r from-red-600 to-red-500 text-white"
                     : "border border-white/10 bg-black/20 text-gray-300 hover:text-white"
                 }`}
@@ -852,8 +934,8 @@ const PanelStory = () => {
             </div>
           </div>
 
-          {/* Colonne droite : social + avis + boutiques */}
-          <div className="col-span-12 flex flex-col gap-4 lg:col-span-6">
+          {/* Colonne droite : social + avis + boutiques (sticky en desktop) */}
+          <div className="col-span-12 flex flex-col gap-4 lg:col-span-6 lg:sticky lg:top-24 lg:self-start">
             {/* social */}
             <div>
               <div className="mb-2 flex items-center justify-between">
@@ -937,8 +1019,8 @@ const PanelStory = () => {
               </button>
             </div>
 
-            {/* formulaire d'avis — reste collé en bas (sticky) */}
-            <div className="sticky bottom-2 z-30 rounded-2xl border border-white/10 bg-black/80 p-3 shadow-2xl backdrop-blur">
+            {/* formulaire d'avis */}
+            <div className="z-30 rounded-2xl border border-white/10 bg-black/80 p-3 shadow-2xl backdrop-blur">
               <ReviewForm onAdd={(r) => setReviews((p) => [r, ...p])} />
             </div>
           </div>
@@ -1272,6 +1354,10 @@ const HorizontalExperience = () => {
           100% { transform: translateY(-108vh) translateX(var(--drift, 0)) scale(1.15); opacity: 0; }
         }
         .tt-heart { animation-name: ttHeart; animation-timing-function: linear; animation-iteration-count: infinite; will-change: transform, opacity; }
+        @keyframes catOut { from { transform: none; opacity: 1; } to { transform: translateX(-42px) scaleX(0.35); opacity: 0; } }
+        @keyframes catIn { 0% { transform: translateX(-42px) scaleX(0.35); opacity: 0; } 100% { transform: none; opacity: 1; } }
+        .cat-out { animation: catOut 0.26s ease-in forwards; transform-origin: left center; }
+        .cat-in { animation: catIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards; transform-origin: left center; }
       `}</style>
     </div>
   );
