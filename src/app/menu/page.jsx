@@ -87,6 +87,37 @@ const IMG = {
     "/food/photo-1571091718767-18b5b1457add.jpg",
 };
 
+/* Bannières promo YossFood (fournies) */
+const BANNERS = [
+  "/banners/banner1.jpg",
+  "/banners/banner2.jpg",
+  "/banners/banner3.jpg",
+  "/banners/banner4.jpg",
+];
+
+/* Bande de bannières réutilisable */
+function BannerStrip({ images, className = "" }) {
+  return (
+    <section className={`bg-[#fff8ef] ${className}`}>
+      <div className="mx-auto grid max-w-7xl gap-4 px-4 md:px-6 sm:grid-cols-2">
+        {images.map((b, i) => (
+          <a
+            key={i}
+            href="#menu"
+            className="group overflow-hidden rounded-3xl shadow-lg ring-1 ring-black/5"
+          >
+            <img
+              src={b}
+              alt="Promo YossFood"
+              className="aspect-square w-full object-cover transition duration-500 group-hover:scale-105"
+            />
+          </a>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 /* ================================================================ */
 /*  DOODLES SVG (icônes dessinées en arrière-plan, comme le design) */
 /* ================================================================ */
@@ -284,7 +315,7 @@ function Header() {
     <header className="sticky top-0 z-50 border-b border-black/5 bg-[#fff8ef]/95 backdrop-blur">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-2.5 md:px-6">
         <Link href="/" className="flex shrink-0 items-center">
-          <img src={logo} alt="YossFood" className="h-32 w-32 object-contain md:h-40 md:w-40" />
+          <img src={logo} alt="YossFood" className="h-12 w-12 object-contain md:h-14 md:w-14" />
         </Link>
 
         <nav className="hidden items-center gap-7 lg:flex">
@@ -426,60 +457,21 @@ function Promos() {
   return (
     <section className="relative bg-[#fff8ef] pb-6">
       <Deco className="right-6 top-2 text-red-300/50"><DoodleFries className="h-10 w-8" /></Deco>
-      <div className="relative z-10 mx-auto grid max-w-7xl gap-4 px-4 md:px-6 lg:grid-cols-3">
-        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-amber-400 to-amber-500 p-6 lg:col-span-2">
-          <Deco className="right-4 top-3 text-white/30"><DoodleDots className="h-6 w-10" /></Deco>
-          <div className="flex items-center justify-between gap-4">
-            <div>
-              <p className="text-3xl font-black uppercase italic text-white drop-shadow sm:text-4xl">Burger</p>
-              <p className="text-sm font-bold uppercase tracking-wide text-white/90">
-                Le goût parfait pour vous — super facile
-              </p>
-              <button className="mt-4 flex items-center gap-2 rounded-full bg-gray-900 px-5 py-2 text-xs font-bold text-white">
-                Commander <ChevronRight size={14} />
-              </button>
-            </div>
-            <Dish src={IMG.burger1} alt="Burger" Icon={Beef} className="h-28 w-28 shrink-0 rounded-2xl object-cover shadow-lg sm:h-36 sm:w-36" imgClass="rounded-2xl object-cover" />
-          </div>
-        </div>
-
-        <div className="relative flex items-center gap-4 overflow-hidden rounded-3xl bg-gradient-to-br from-red-500 to-red-600 p-6">
-          <div>
-            <span className="inline-flex items-center gap-1 rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-black uppercase text-white">
-              <BadgePercent size={12} /> -50%
-            </span>
-            <p className="mt-2 text-2xl font-black uppercase text-white">Super Délicieux Burger</p>
-            <button className="mt-3 rounded-full bg-white px-4 py-1.5 text-xs font-bold text-red-600">Commander</button>
-          </div>
-          <Dish src={IMG.burger2} alt="Burger" Icon={Beef} className="h-24 w-24 shrink-0 rounded-2xl object-cover" imgClass="rounded-2xl object-cover" />
-        </div>
-
-        <div className="relative flex items-center gap-3 overflow-hidden rounded-3xl bg-gray-900 p-5">
-          <div className="min-w-0">
-            <p className="text-lg font-black uppercase text-white">Grilled Burger</p>
-            <p className="text-xs text-gray-300">Offre spéciale du jour</p>
-            <p className="mt-1 text-xl font-black text-amber-400">3 000 {CURRENCY}</p>
-          </div>
-          <Dish src={IMG.burger3} alt="Burger" Icon={Beef} className="h-20 w-20 shrink-0 rounded-2xl object-cover" imgClass="rounded-2xl object-cover" />
-        </div>
-
-        <div className="relative flex items-center gap-3 overflow-hidden rounded-3xl bg-gradient-to-br from-orange-500 to-red-500 p-5">
-          <div className="min-w-0">
-            <p className="text-lg font-black uppercase text-white">Hot Burger</p>
-            <p className="text-xs text-white/80">Croustillant & épicé</p>
-            <span className="mt-1 inline-block rounded-full bg-white px-2 py-0.5 text-xs font-black text-red-600">3 800 {CURRENCY}</span>
-          </div>
-          <Dish src={IMG.fries} alt="Hot burger" Icon={Beef} className="h-20 w-20 shrink-0 rounded-2xl object-cover" imgClass="rounded-2xl object-cover" />
-        </div>
-
-        <div className="relative flex items-center gap-3 overflow-hidden rounded-3xl bg-gradient-to-br from-[#4a0606] to-[#7a0d0d] p-5">
-          <div className="min-w-0">
-            <span className="inline-block rounded-full bg-amber-500 px-2 py-0.5 text-[10px] font-black text-black">-50% OFF</span>
-            <p className="mt-1 text-lg font-black uppercase text-white">Triple Stack Burger</p>
-            <p className="text-xs text-gray-300">Édition limitée</p>
-          </div>
-          <Dish src={IMG.burger1} alt="Triple stack" Icon={Beef} className="h-20 w-20 shrink-0 rounded-2xl object-cover" imgClass="rounded-2xl object-cover" />
-        </div>
+      <Deco className="left-6 top-4 text-amber-300/50"><DoodleDots className="h-6 w-10" /></Deco>
+      <div className="relative z-10 mx-auto grid max-w-7xl gap-4 px-4 md:px-6 sm:grid-cols-2 lg:grid-cols-4">
+        {BANNERS.map((b, i) => (
+          <a
+            key={i}
+            href="#menu"
+            className="group overflow-hidden rounded-3xl shadow-lg ring-1 ring-black/5"
+          >
+            <img
+              src={b}
+              alt={`Promo YossFood ${i + 1}`}
+              className="aspect-square w-full object-cover transition duration-500 group-hover:scale-105"
+            />
+          </a>
+        ))}
       </div>
     </section>
   );
@@ -796,7 +788,9 @@ export default function MenuPage() {
       <Hero />
       <Promos />
       <Favourites />
+      <BannerStrip images={[BANNERS[2], BANNERS[3]]} className="pb-12" />
       <Premium />
+      <BannerStrip images={[BANNERS[0], BANNERS[1]]} className="py-12" />
       <DeliveryCTA />
       <Footer />
 

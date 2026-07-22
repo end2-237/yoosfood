@@ -187,13 +187,13 @@ const NavBar = ({ current, goTo }) => {
     { label: "App Mobile", panel: 3 },
   ];
   return (
-    <header className="pointer-events-none absolute inset-x-0 top-0 z-40 flex items-start justify-between gap-3 px-4 py-2 md:px-10 md:py-3">
+    <header className="pointer-events-none absolute inset-x-0 top-0 z-40 flex items-center justify-between gap-3 px-4 py-2 md:px-10 md:py-3">
       {/* Logo */}
       <button
         onClick={() => goTo(0)}
         className="pointer-events-auto flex shrink-0 items-center gap-2"
       >
-        <img src={logo} alt="YossFood" className="h-32 w-32 object-contain drop-shadow-lg md:h-40 md:w-40" />
+        <img src={logo} alt="YossFood" className="h-14 w-14 object-contain drop-shadow-lg md:h-16 md:w-16" />
       </button>
 
       {/* Liens centraux */}
@@ -267,11 +267,56 @@ const Kicker = ({ children }) => (
    verticalement sur les petits écrans (plus rien n'est coupé). */
 const PanelShell = ({ children, className = "" }) => (
   <div
-    className={`hide-scroll relative z-10 flex h-full flex-col overflow-y-auto px-5 pb-24 pt-36 md:px-10 md:pt-44 ${className}`}
+    className={`hide-scroll relative z-10 flex h-full flex-col overflow-y-auto px-5 pb-24 pt-24 md:px-10 md:pt-28 ${className}`}
   >
     <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col justify-start lg:justify-center">
       {children}
     </div>
+  </div>
+);
+
+/* Beaucoup de doodles food en fond du hero */
+const HERO_DOODLE_ICONS = [
+  Pizza, Beef, Drumstick, CupSoda, IceCream, Cookie, Salad, Carrot,
+  Flame, Sandwich, Utensils, Star, Gift, ChefHat,
+];
+const HERO_DOODLES = Array.from({ length: 50 }, (_, i) => {
+  const r = (n) => {
+    const x = Math.sin(i * 71.3 + n * 41.7) * 10000;
+    return x - Math.floor(x);
+  };
+  return {
+    Icon: HERO_DOODLE_ICONS[i % HERO_DOODLE_ICONS.length],
+    top: `${(r(1) * 96).toFixed(1)}%`,
+    left: `${(r(2) * 97).toFixed(1)}%`,
+    size: 16 + Math.round(r(3) * 30),
+    rot: Math.round(r(4) * 360),
+    dur: (4 + r(5) * 5).toFixed(2),
+    delay: (r(6) * 5).toFixed(2),
+    tone: ["text-white/10", "text-amber-300/20", "text-red-400/20"][i % 3],
+  };
+});
+
+const HeroDoodles = () => (
+  <div className="pointer-events-none absolute inset-0 z-[2] overflow-hidden">
+    {HERO_DOODLES.map((d, i) => {
+      const Icon = d.Icon;
+      return (
+        <span
+          key={i}
+          className={`hero-float absolute ${d.tone}`}
+          style={{
+            top: d.top,
+            left: d.left,
+            "--r": `${d.rot}deg`,
+            animationDuration: `${d.dur}s`,
+            animationDelay: `${d.delay}s`,
+          }}
+        >
+          <Icon size={d.size} strokeWidth={1.7} />
+        </span>
+      );
+    })}
   </div>
 );
 
@@ -319,6 +364,8 @@ const PanelHero = () => {
       <div className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-r from-[#2a0303]/95 via-[#3a0505]/45 to-transparent" />
 
       <div className="pointer-events-none absolute left-1/2 top-1/3 z-0 h-[600px] w-[600px] max-w-full -translate-x-1/2 rounded-full bg-red-500/20 blur-[120px]" />
+
+      <HeroDoodles />
 
       <PanelShell>
         <div className="grid grid-cols-12 gap-6">
@@ -582,6 +629,19 @@ const PanelMenu = () => {
     { c: "bg-gray-100", n: "Blanche" },
   ];
 
+  // Personnalisez votre menu (interactif)
+  const SUPP_PRICE = { Fromage: 250, "Extra Crispy": 300, "Extra Poulet": 600 };
+  const SIZE_PRICE = { Normal: 0, Grand: 500, XL: 1000 };
+  const BASE = 2500;
+  const [supp, setSupp] = useState({ Fromage: true, "Extra Crispy": true, "Extra Poulet": false });
+  const [size, setSize] = useState("Grand");
+  const [sauceSel, setSauceSel] = useState("Piquante");
+  const menuTotal =
+    BASE +
+    SIZE_PRICE[size] +
+    Object.keys(supp).reduce((s, k) => s + (supp[k] ? SUPP_PRICE[k] : 0), 0);
+  const toggleSupp = (k) => setSupp((p) => ({ ...p, [k]: !p[k] }));
+
   return (
     <div className="relative h-full w-full overflow-hidden bg-gradient-to-br from-[#2a0404] via-[#5c0909] to-[#320505]">
       <HeartsRain />
@@ -679,57 +739,79 @@ const PanelMenu = () => {
             <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
               <div>
                 <p className="mb-2 text-xs text-gray-400">Suppléments</p>
-                {[
-                  ["Fromage", "+250 F", true],
-                  ["Extra Crispy", "+300 F", true],
-                  ["Extra Poulet", "+600 F", false],
-                ].map(([n, p, on]) => (
-                  <label key={n} className="mb-1.5 flex items-center gap-2 text-xs text-white">
-                    <span
-                      className={`grid h-4 w-4 shrink-0 place-items-center rounded ${
-                        on ? "bg-red-600" : "border border-white/30"
-                      }`}
+                {Object.keys(SUPP_PRICE).map((n) => {
+                  const on = supp[n];
+                  return (
+                    <button
+                      key={n}
+                      type="button"
+                      onClick={() => toggleSupp(n)}
+                      className="mb-1.5 flex w-full items-center gap-2 text-left text-xs text-white"
                     >
-                      {on && <Check size={11} className="text-white" />}
-                    </span>
-                    <span className="flex-1">{n}</span>
-                    <span className="text-gray-400">{p}</span>
-                  </label>
-                ))}
+                      <span
+                        className={`grid h-4 w-4 shrink-0 place-items-center rounded transition ${
+                          on ? "bg-red-600" : "border border-white/30"
+                        }`}
+                      >
+                        {on && <Check size={11} className="text-white" />}
+                      </span>
+                      <span className="flex-1">{n}</span>
+                      <span className="text-gray-400">+{SUPP_PRICE[n]} F</span>
+                    </button>
+                  );
+                })}
               </div>
               <div>
                 <p className="mb-2 text-xs text-gray-400">Sauce</p>
                 <div className="grid grid-cols-2 gap-1.5">
                   {sauces.map((s) => (
-                    <span
+                    <button
                       key={s.n}
+                      type="button"
                       title={s.n}
-                      className="grid h-9 place-items-center rounded-lg border border-white/10 bg-black/40"
+                      onClick={() => setSauceSel(s.n)}
+                      className={`grid h-9 place-items-center rounded-lg border bg-black/40 transition ${
+                        sauceSel === s.n ? "border-red-500 ring-2 ring-red-500/40" : "border-white/10"
+                      }`}
                     >
                       <span className={`h-4 w-4 rounded-full ${s.c}`} />
-                    </span>
+                    </button>
                   ))}
                 </div>
               </div>
               <div>
                 <p className="mb-2 text-xs text-gray-400">Taille</p>
-                {["Normal", "Grand", "XL"].map((t, i) => (
-                  <div
+                {["Normal", "Grand", "XL"].map((t) => (
+                  <button
                     key={t}
-                    className={`mb-1.5 rounded-lg px-2 py-1.5 text-center text-xs font-semibold ${
-                      i === 1 ? "bg-red-600 text-white" : "bg-black/40 text-gray-300"
+                    type="button"
+                    onClick={() => setSize(t)}
+                    className={`mb-1.5 block w-full rounded-lg px-2 py-1.5 text-center text-xs font-semibold transition ${
+                      size === t ? "bg-red-600 text-white" : "bg-black/40 text-gray-300 hover:bg-black/60"
                     }`}
                   >
                     {t}
-                  </div>
+                    {SIZE_PRICE[t] > 0 && <span className="ml-1 text-[10px] opacity-70">+{SIZE_PRICE[t]} F</span>}
+                  </button>
                 ))}
               </div>
               <div>
                 <p className="mb-2 text-xs text-gray-400">Votre Menu</p>
                 <div className="rounded-xl bg-black/40 p-3 text-center">
-                  <p className="text-xs text-gray-400">Menu Zinger</p>
-                  <p className="my-1 text-xl font-black text-amber-400">3 250 F</p>
-                  <button className="w-full rounded-full bg-gradient-to-r from-red-600 to-red-500 py-2 text-xs font-bold text-white">
+                  <p className="text-xs text-gray-400">Menu Zinger · {size}</p>
+                  <p className="my-1 text-xl font-black text-amber-400">
+                    {menuTotal.toLocaleString("fr-FR")} F
+                  </p>
+                  <button
+                    onClick={() =>
+                      addItem({
+                        name: `Menu Zinger ${size} · Sauce ${sauceSel}`,
+                        price: menuTotal,
+                        img: IMG.burger,
+                      })
+                    }
+                    className="w-full rounded-full bg-gradient-to-r from-red-600 to-red-500 py-2 text-xs font-bold text-white transition hover:from-red-700 hover:to-red-600"
+                  >
                     Ajouter au panier
                   </button>
                 </div>
@@ -767,7 +849,11 @@ const PanelMenu = () => {
                 { n: "Zinger Minuit", p: "3 490 F", o: "5 590 F", img: IMG.burger, Icon: Beef },
                 { n: "Ailes Nuit", p: "1 990 F", o: "3 290 F", img: IMG.wings, Icon: Drumstick },
               ].map((d) => (
-                <div key={d.n} className="rounded-xl border border-white/10 bg-black/40 p-2">
+                <button
+                  key={d.n}
+                  onClick={() => addItem({ name: d.n, price: d.p, img: d.img })}
+                  className="group rounded-xl border border-white/10 bg-black/40 p-2 text-left transition hover:border-red-500/60 hover:bg-black/60"
+                >
                   <Food
                     src={d.img}
                     alt={d.n}
@@ -778,7 +864,10 @@ const PanelMenu = () => {
                   <p className="truncate text-[11px] font-bold text-white">{d.n}</p>
                   <p className="text-sm font-black text-amber-400">{d.p}</p>
                   <p className="text-[10px] text-gray-500 line-through">{d.o}</p>
-                </div>
+                  <span className="mt-1 flex items-center gap-1 text-[10px] font-bold text-red-400 opacity-0 transition group-hover:opacity-100">
+                    <Plus size={11} /> Ajouter
+                  </span>
+                </button>
               ))}
             </div>
           </div>
@@ -1358,6 +1447,8 @@ const HorizontalExperience = () => {
         @keyframes catIn { 0% { transform: translateX(-42px) scaleX(0.35); opacity: 0; } 100% { transform: none; opacity: 1; } }
         .cat-out { animation: catOut 0.26s ease-in forwards; transform-origin: left center; }
         .cat-in { animation: catIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards; transform-origin: left center; }
+        @keyframes heroFloat { 0%, 100% { transform: translateY(0) rotate(var(--r, 0deg)); } 50% { transform: translateY(-9px) rotate(var(--r, 0deg)); } }
+        .hero-float { animation: heroFloat 6s ease-in-out infinite; }
       `}</style>
     </div>
   );
