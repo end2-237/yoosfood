@@ -381,13 +381,52 @@ function Header() {
   );
 }
 
+/* Beaucoup de doodles dans le hero */
+const HERO_DOODLE_COMPS = [
+  DoodleBurger, DoodleLeaf, DoodleCup, DoodleTomato, DoodleSparkle, DoodleSwirl, DoodleFries,
+];
+const HERO_SCATTER = Array.from({ length: 30 }, (_, i) => {
+  const r = (n) => {
+    const x = Math.sin(i * 57.3 + n * 91.7) * 10000;
+    return x - Math.floor(x);
+  };
+  return {
+    Comp: HERO_DOODLE_COMPS[i % HERO_DOODLE_COMPS.length],
+    top: `${(r(1) * 92).toFixed(1)}%`,
+    left: `${(r(2) * 95).toFixed(1)}%`,
+    size: 22 + Math.round(r(3) * 32),
+    rot: Math.round(r(4) * 360),
+    tone: ["text-red-300/45", "text-amber-300/50", "text-red-200/50", "text-orange-300/45"][i % 4],
+  };
+});
+function HeroScatter() {
+  return (
+    <div className="pointer-events-none absolute inset-0 overflow-hidden">
+      {HERO_SCATTER.map((d, i) => {
+        const C = d.Comp;
+        return (
+          <span
+            key={i}
+            className={`absolute ${d.tone}`}
+            style={{ top: d.top, left: d.left, transform: `rotate(${d.rot}deg)` }}
+          >
+            <C style={{ width: d.size, height: d.size }} />
+          </span>
+        );
+      })}
+    </div>
+  );
+}
+
 /* ================================================================ */
 /*  HERO                                                            */
 /* ================================================================ */
 function Hero() {
   return (
     <section className="relative overflow-hidden bg-[#fff8ef]">
-      {/* doodles arrière-plan */}
+      <div className="pointer-events-none absolute -right-24 top-1/2 h-[420px] w-[420px] max-w-full -translate-y-1/2 rounded-full bg-amber-200/40 blur-3xl" />
+      {/* beaucoup de doodles en arrière-plan */}
+      <HeroScatter />
       <Deco className="left-6 top-10 text-red-300/50"><DoodleBurger className="h-12 w-16 rotate-[-8deg]" /></Deco>
       <Deco className="left-1/3 top-6 text-amber-400/50"><DoodleDots className="h-6 w-10" /></Deco>
       <Deco className="right-10 top-8 text-red-300/50"><DoodleCup className="h-12 w-9" /></Deco>
@@ -458,17 +497,22 @@ function Promos() {
     <section className="relative bg-[#fff8ef] pb-6">
       <Deco className="right-6 top-2 text-red-300/50"><DoodleFries className="h-10 w-8" /></Deco>
       <Deco className="left-6 top-4 text-amber-300/50"><DoodleDots className="h-6 w-10" /></Deco>
-      <div className="relative z-10 mx-auto grid max-w-7xl gap-4 px-4 md:px-6 sm:grid-cols-2 lg:grid-cols-4">
-        {BANNERS.map((b, i) => (
+      <div className="relative z-10 mx-auto grid max-w-7xl auto-rows-[150px] grid-cols-2 gap-4 px-4 md:auto-rows-[220px] md:grid-cols-4 md:px-6">
+        {[
+          "col-span-2 row-span-2",
+          "col-span-2 row-span-1",
+          "col-span-1 row-span-1",
+          "col-span-1 row-span-1",
+        ].map((span, i) => (
           <a
             key={i}
             href="#menu"
-            className="group overflow-hidden rounded-3xl shadow-lg ring-1 ring-black/5"
+            className={`group relative overflow-hidden rounded-3xl shadow-lg ring-1 ring-black/5 ${span}`}
           >
             <img
-              src={b}
+              src={BANNERS[i]}
               alt={`Promo YossFood ${i + 1}`}
-              className="aspect-square w-full object-cover transition duration-500 group-hover:scale-105"
+              className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
             />
           </a>
         ))}
