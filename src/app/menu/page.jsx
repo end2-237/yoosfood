@@ -303,7 +303,7 @@ const CATEGORIES = [
 /* ================================================================ */
 function Header() {
   const [open, setOpen] = useState(false);
-  const { count } = useCart();
+  const { count, openCart } = useCart();
   const nav = [
     { label: "Accueil", href: "/" },
     { label: "Menu", href: "#menu" },
@@ -336,8 +336,8 @@ function Header() {
               <p className="text-sm font-black text-gray-900">237 691 17 54 80</p>
             </div>
           </div>
-          <Link
-            href="/panier"
+          <button
+            onClick={openCart}
             aria-label="Panier"
             className="relative grid h-10 w-10 place-items-center rounded-full bg-red-100 text-red-600 transition hover:bg-red-200"
           >
@@ -347,7 +347,7 @@ function Header() {
                 {count}
               </span>
             )}
-          </Link>
+          </button>
           <button className="flex items-center gap-2 rounded-full bg-red-600 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-red-600/25 transition hover:bg-red-700">
             <User size={16} /> Connexion
           </button>

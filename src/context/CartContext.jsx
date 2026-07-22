@@ -9,6 +9,7 @@ const toNumber = (p) => Number(String(p).replace(/[^\d.,]/g, "").replace(/\s/g, 
 export function CartProvider({ children }) {
   const [items, setItems] = useState([]); // { id, name, price:number, img, qty }
   const [ready, setReady] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
     try {
@@ -42,7 +43,12 @@ export function CartProvider({ children }) {
       }
       return [...prev, { id, name: item.name, price, img: item.img || "", qty }];
     });
+    setIsOpen(true); // ouvre le panier-tiroir à chaque ajout (intuitif)
   };
+
+  const openCart = () => setIsOpen(true);
+  const closeCart = () => setIsOpen(false);
+  const toggleCart = () => setIsOpen((v) => !v);
 
   const removeItem = (id) => setItems((prev) => prev.filter((x) => x.id !== id));
   const setQty = (id, qty) =>
@@ -53,7 +59,9 @@ export function CartProvider({ children }) {
   const total = items.reduce((s, x) => s + x.qty * x.price, 0);
 
   return (
-    <CartContext.Provider value={{ items, addItem, removeItem, setQty, clear, count, total, ready }}>
+    <CartContext.Provider
+      value={{ items, addItem, removeItem, setQty, clear, count, total, ready, isOpen, openCart, closeCart, toggleCart }}
+    >
       {children}
     </CartContext.Provider>
   );
@@ -70,6 +78,10 @@ export function useCart() {
       count: 0,
       total: 0,
       ready: false,
+      isOpen: false,
+      openCart: () => {},
+      closeCart: () => {},
+      toggleCart: () => {},
     }
   );
 }

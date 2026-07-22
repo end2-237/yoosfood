@@ -1,5 +1,6 @@
 import "./globals.css";
 import { CartProvider } from "../context/CartContext";
+import CartDrawer from "../components/CartDrawer";
 
 export const metadata = {
   title: "YoosFood — Croustillant. Audacieux. Irrésistible.",
@@ -16,7 +17,10 @@ export default function RootLayout({ children }) {
   return (
     <html lang="fr">
       <body>
-        <CartProvider>{children}</CartProvider>
+        <CartProvider>
+          {children}
+          <CartDrawer />
+        </CartProvider>
       </body>
     </html>
   );

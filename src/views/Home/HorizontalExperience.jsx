@@ -179,7 +179,7 @@ const PRODUCTS_BY_CAT = {
 /*  Barre de navigation fixe (commune aux 4 panneaux)                  */
 /* ------------------------------------------------------------------ */
 const NavBar = ({ current, goTo }) => {
-  const { count } = useCart();
+  const { count, openCart } = useCart();
   const links = [
     { label: "Accueil", panel: 0 },
     { label: "Menu", panel: 1 },
@@ -222,14 +222,14 @@ const NavBar = ({ current, goTo }) => {
         <button className="hidden rounded-full p-2 transition hover:bg-white/10 sm:block">
           <User size={20} />
         </button>
-        <Link href="/panier" aria-label="Panier" className="relative rounded-full p-2 transition hover:bg-white/10">
+        <button onClick={openCart} aria-label="Panier" className="relative rounded-full p-2 transition hover:bg-white/10">
           <ShoppingBag size={20} />
           {count > 0 && (
             <span className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-red-600 px-1 text-[9px] font-black text-white">
               {count}
             </span>
           )}
-        </Link>
+        </button>
         <Link
           href="/menu"
           className="hidden items-center gap-2 rounded-full border border-white/25 px-4 py-2 text-sm font-bold text-white transition hover:bg-white/10 sm:flex"
@@ -630,14 +630,21 @@ const PanelMenu = () => {
   ];
 
   // Personnalisez votre menu (interactif)
+  const BASE_MENUS = [
+    { name: "Menu Zinger", price: 2500, img: IMG.burger },
+    { name: "Menu Box Crispy", price: 2900, img: IMG.boxmeal },
+    { name: "Menu Twister", price: 2100, img: IMG.wrap },
+    { name: "Menu Bucket", price: 3500, img: IMG.bucket },
+  ];
   const SUPP_PRICE = { Fromage: 250, "Extra Crispy": 300, "Extra Poulet": 600 };
   const SIZE_PRICE = { Normal: 0, Grand: 500, XL: 1000 };
-  const BASE = 2500;
+  const [baseMenu, setBaseMenu] = useState(0);
   const [supp, setSupp] = useState({ Fromage: true, "Extra Crispy": true, "Extra Poulet": false });
   const [size, setSize] = useState("Grand");
   const [sauceSel, setSauceSel] = useState("Piquante");
+  const base = BASE_MENUS[baseMenu];
   const menuTotal =
-    BASE +
+    base.price +
     SIZE_PRICE[size] +
     Object.keys(supp).reduce((s, k) => s + (supp[k] ? SUPP_PRICE[k] : 0), 0);
   const toggleSupp = (k) => setSupp((p) => ({ ...p, [k]: !p[k] }));
@@ -733,9 +740,26 @@ const PanelMenu = () => {
         <div className="grid grid-cols-12 gap-6">
           {/* personnalisation */}
           <div className="col-span-12 rounded-2xl border border-white/10 bg-black/30 p-5 backdrop-blur lg:col-span-6">
-            <p className="mb-4 text-sm font-black tracking-wide text-white">
+            <p className="mb-3 text-sm font-black tracking-wide text-white">
               PERSONNALISEZ VOTRE MENU
             </p>
+            {/* choix du menu de base à personnaliser */}
+            <div className="hide-scroll mb-4 flex gap-2 overflow-x-auto pb-1">
+              {BASE_MENUS.map((m, i) => (
+                <button
+                  key={m.name}
+                  onClick={() => setBaseMenu(i)}
+                  className={`flex shrink-0 items-center gap-2 rounded-xl border px-3 py-1.5 text-xs font-bold transition ${
+                    i === baseMenu
+                      ? "border-red-500 bg-red-600 text-white"
+                      : "border-white/10 bg-black/30 text-gray-300 hover:text-white"
+                  }`}
+                >
+                  <img src={m.img} alt="" className="h-6 w-6 rounded-md object-cover" />
+                  {m.name}
+                </button>
+              ))}
+            </div>
             <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
               <div>
                 <p className="mb-2 text-xs text-gray-400">Suppléments</p>
@@ -798,16 +822,16 @@ const PanelMenu = () => {
               <div>
                 <p className="mb-2 text-xs text-gray-400">Votre Menu</p>
                 <div className="rounded-xl bg-black/40 p-3 text-center">
-                  <p className="text-xs text-gray-400">Menu Zinger · {size}</p>
+                  <p className="truncate text-xs text-gray-400">{base.name} · {size}</p>
                   <p className="my-1 text-xl font-black text-amber-400">
                     {menuTotal.toLocaleString("fr-FR")} F
                   </p>
                   <button
                     onClick={() =>
                       addItem({
-                        name: `Menu Zinger ${size} · Sauce ${sauceSel}`,
+                        name: `${base.name} ${size} · Sauce ${sauceSel}`,
                         price: menuTotal,
-                        img: IMG.burger,
+                        img: base.img,
                       })
                     }
                     className="w-full rounded-full bg-gradient-to-r from-red-600 to-red-500 py-2 text-xs font-bold text-white transition hover:from-red-700 hover:to-red-600"
