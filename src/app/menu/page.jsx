@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { useCart } from "../../context/CartContext";
 import {
   Phone,
   User,
@@ -271,6 +272,7 @@ const CATEGORIES = [
 /* ================================================================ */
 function Header() {
   const [open, setOpen] = useState(false);
+  const { count } = useCart();
   const nav = [
     { label: "Accueil", href: "/" },
     { label: "Menu", href: "#menu" },
@@ -303,9 +305,18 @@ function Header() {
               <p className="text-sm font-black text-gray-900">237 691 17 54 80</p>
             </div>
           </div>
-          <button aria-label="Panier" className="grid h-10 w-10 place-items-center rounded-full bg-red-100 text-red-600">
+          <Link
+            href="/panier"
+            aria-label="Panier"
+            className="relative grid h-10 w-10 place-items-center rounded-full bg-red-100 text-red-600 transition hover:bg-red-200"
+          >
             <ShoppingBag size={18} />
-          </button>
+            {count > 0 && (
+              <span className="absolute -right-1 -top-1 grid h-5 min-w-5 place-items-center rounded-full bg-red-600 px-1 text-[10px] font-black text-white">
+                {count}
+              </span>
+            )}
+          </Link>
           <button className="flex items-center gap-2 rounded-full bg-red-600 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-red-600/25 transition hover:bg-red-700">
             <User size={16} /> Connexion
           </button>
@@ -479,6 +490,7 @@ function Promos() {
 /* ================================================================ */
 function Favourites() {
   const [active, setActive] = useState("chicken");
+  const { addItem } = useCart();
   const current = CATEGORIES.find((c) => c.id === active) || CATEGORIES[0];
 
   return (
@@ -544,8 +556,9 @@ function Favourites() {
                 </p>
               </div>
               <button
+                onClick={() => addItem({ name: item.name, price: item.price, img: item.img })}
                 aria-label="Ajouter au panier"
-                className="grid h-9 w-9 shrink-0 place-items-center self-center rounded-full bg-red-600 text-white transition hover:bg-red-700"
+                className="grid h-9 w-9 shrink-0 place-items-center self-center rounded-full bg-red-600 text-white transition hover:scale-110 hover:bg-red-700"
               >
                 <Plus size={16} />
               </button>

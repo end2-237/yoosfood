@@ -39,7 +39,10 @@ import {
   Utensils,
   Beef,
   UtensilsCrossed,
+  Send,
 } from "lucide-react";
+import { useCart } from "../../context/CartContext";
+import { SupabaseService } from "../../services/SupabaseServices";
 
 // Le logo est servi depuis /public (fond détouré -> voir public/yfl1.png)
 const logo = "/yfl1.png";
@@ -105,6 +108,7 @@ const IMG = {
 /*  Barre de navigation fixe (commune aux 4 panneaux)                  */
 /* ------------------------------------------------------------------ */
 const NavBar = ({ current, goTo }) => {
+  const { count } = useCart();
   const links = [
     { label: "Accueil", panel: 0 },
     { label: "Menu", panel: 1 },
@@ -147,6 +151,14 @@ const NavBar = ({ current, goTo }) => {
         <button className="hidden rounded-full p-2 transition hover:bg-white/10 sm:block">
           <User size={20} />
         </button>
+        <Link href="/panier" aria-label="Panier" className="relative rounded-full p-2 transition hover:bg-white/10">
+          <ShoppingBag size={20} />
+          {count > 0 && (
+            <span className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-red-600 px-1 text-[9px] font-black text-white">
+              {count}
+            </span>
+          )}
+        </Link>
         <Link
           href="/menu"
           className="hidden items-center gap-2 rounded-full border border-white/25 px-4 py-2 text-sm font-bold text-white transition hover:bg-white/10 sm:flex"
@@ -196,6 +208,7 @@ const PanelShell = ({ children, className = "" }) => (
 /*  PANNEAU 1 — ACCUEIL / HERO                                         */
 /* ================================================================== */
 const PanelHero = () => {
+  const { addItem } = useCart();
   const features = [
     { icon: Bike, color: "from-red-600 to-red-500", top: "Livraison en", big: "20 Minutes", sub: "Rapide, chaud & frais à votre porte." },
     { icon: Flame, color: "from-amber-500 to-yellow-500", top: "100%", big: "Poulet Frais", sub: "Pané à la main, cuit à la commande." },
@@ -377,7 +390,10 @@ const PanelHero = () => {
                   className="h-14 w-14 shrink-0 rounded-xl object-cover"
                   imgClass="rounded-xl object-cover"
                 />
-                <button className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-red-600 text-white">
+                <button
+                  onClick={() => addItem({ name: p.name, price: p.price, img: p.img })}
+                  className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-red-600 text-white transition hover:scale-110"
+                >
                   <Plus size={14} />
                 </button>
               </div>
@@ -389,10 +405,46 @@ const PanelHero = () => {
   );
 };
 
+/* Pluie de cœurs (façon live TikTok) — montent en continu sur tout le panneau */
+const HEARTS = Array.from({ length: 26 }, (_, i) => {
+  const r = (n) => {
+    const x = Math.sin(i * 99.7 + n * 57.3) * 10000;
+    return x - Math.floor(x);
+  };
+  return {
+    left: `${(r(1) * 100).toFixed(1)}%`,
+    size: 14 + Math.round(r(2) * 28),
+    dur: (4 + r(3) * 5).toFixed(2),
+    delay: (r(4) * 7).toFixed(2),
+    drift: `${Math.round(r(5) * 80 - 40)}px`,
+    tone: ["text-red-500", "text-pink-400", "text-amber-400", "text-rose-300", "text-red-400"][i % 5],
+  };
+});
+
+const HeartsRain = () => (
+  <div className="pointer-events-none absolute inset-0 z-20 overflow-hidden">
+    {HEARTS.map((h, i) => (
+      <span
+        key={i}
+        className="tt-heart absolute -bottom-10"
+        style={{
+          left: h.left,
+          animationDuration: `${h.dur}s`,
+          animationDelay: `${h.delay}s`,
+          "--drift": h.drift,
+        }}
+      >
+        <Heart size={h.size} className={h.tone} fill="currentColor" />
+      </span>
+    ))}
+  </div>
+);
+
 /* ================================================================== */
 /*  PANNEAU 2 — MENU                                                   */
 /* ================================================================== */
 const PanelMenu = () => {
+  const { addItem } = useCart();
   const featured = [
     { name: "Menu Burger Zinger", meta: "670 kcal", price: "2 900 F", img: IMG.burger, Icon: Beef, popular: true },
     { name: "Bucket Familial", meta: "8 Pièces", price: "8 900 F", img: IMG.bucket, Icon: Drumstick },
@@ -418,6 +470,7 @@ const PanelMenu = () => {
 
   return (
     <div className="relative h-full w-full overflow-hidden bg-gradient-to-br from-[#2a0404] via-[#5c0909] to-[#320505]">
+      <HeartsRain />
       <PanelShell>
         {/* haut : titre + cartes vedettes */}
         <div className="grid grid-cols-12 gap-6">
@@ -469,7 +522,10 @@ const PanelMenu = () => {
                     <p className="text-[11px] text-gray-400">{f.meta}</p>
                     <p className="mt-1 text-base font-black text-amber-400">{f.price}</p>
                   </div>
-                  <button className="absolute bottom-3 right-2 grid h-7 w-7 place-items-center rounded-full bg-white text-red-600">
+                  <button
+                    onClick={() => addItem({ name: f.name, price: f.price, img: f.img })}
+                    className="absolute bottom-3 right-2 grid h-7 w-7 place-items-center rounded-full bg-white text-red-600 transition hover:scale-110"
+                  >
                     <Plus size={15} />
                   </button>
                 </div>
@@ -617,6 +673,91 @@ const PanelMenu = () => {
   );
 };
 
+/* Sélecteur d'étoiles */
+const StarPicker = ({ value, onChange }) => (
+  <div className="flex gap-1">
+    {[1, 2, 3, 4, 5].map((n) => (
+      <button
+        key={n}
+        type="button"
+        onClick={() => onChange(n)}
+        aria-label={`${n} étoile${n > 1 ? "s" : ""}`}
+        className={n <= value ? "text-amber-400" : "text-gray-600"}
+      >
+        <Star size={20} fill="currentColor" />
+      </button>
+    ))}
+  </div>
+);
+
+/* Formulaire "laisser un avis" */
+const ReviewForm = ({ onAdd }) => {
+  const [name, setName] = useState("");
+  const [rating, setRating] = useState(5);
+  const [comment, setComment] = useState("");
+  const [sent, setSent] = useState(false);
+
+  const submit = async (e) => {
+    e.preventDefault();
+    if (!name.trim() || !comment.trim()) return;
+    const clean = name.trim();
+    onAdd({ t: comment.trim(), u: "@" + clean.toLowerCase().replace(/\s+/g, ""), rating });
+    try {
+      await SupabaseService.addReview({
+        name: clean,
+        role: "Client",
+        rating,
+        comment: comment.trim(),
+        avatar: clean.slice(0, 2).toUpperCase(),
+        approved: false,
+      });
+    } catch (e2) {
+      /* hors-ligne : l'avis reste affiché localement */
+    }
+    setName("");
+    setComment("");
+    setRating(5);
+    setSent(true);
+    setTimeout(() => setSent(false), 2500);
+  };
+
+  return (
+    <form onSubmit={submit} className="space-y-2">
+      <p className="flex items-center gap-2 text-xs font-black uppercase tracking-wide text-white">
+        <Star size={13} className="text-amber-400" fill="currentColor" /> Laisser un avis
+      </p>
+      <div className="flex flex-col gap-2 sm:flex-row">
+        <input
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+          placeholder="Votre nom"
+          className="w-full rounded-lg bg-white/10 px-3 py-2 text-sm text-white placeholder-gray-400 outline-none ring-1 ring-white/10 focus:ring-2 focus:ring-red-500 sm:w-40"
+        />
+        <StarPicker value={rating} onChange={setRating} />
+      </div>
+      <textarea
+        value={comment}
+        onChange={(e) => setComment(e.target.value)}
+        placeholder="Partagez votre expérience…"
+        rows={2}
+        className="w-full resize-none rounded-lg bg-white/10 px-3 py-2 text-sm text-white placeholder-gray-400 outline-none ring-1 ring-white/10 focus:ring-2 focus:ring-red-500"
+      />
+      <button
+        type="submit"
+        className="flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-red-600 to-red-500 py-2 text-xs font-bold text-white transition hover:from-red-700 hover:to-red-600"
+      >
+        {sent ? (
+          "Merci pour votre avis ✓"
+        ) : (
+          <>
+            <Send size={14} /> Publier mon avis
+          </>
+        )}
+      </button>
+    </form>
+  );
+};
+
 /* ================================================================== */
 /*  PANNEAU 3 — HISTOIRE / SOCIAL / BOUTIQUES                          */
 /* ================================================================== */
@@ -627,11 +768,12 @@ const PanelStory = () => {
     { user: "@chicken.lover", time: "1j", likes: "3 987", img: IMG.wings, Icon: Drumstick, video: true },
     { user: "@bazaar.eats", time: "2j", likes: "1 876", img: IMG.store, Icon: Store },
   ];
-  const reviews = [
-    { t: "La meilleure expérience poulet en ligne.", u: "@paulnkeng" },
-    { t: "Commander est fluide et moderne.", u: "@ayssaguel" },
-    { t: "Ce redesign me donne faim instantanément.", u: "@berthefoodie" },
-  ];
+  const [reviews, setReviews] = useState([
+    { t: "La meilleure expérience poulet en ligne.", u: "@paulnkeng", rating: 5 },
+    { t: "Commander est fluide et moderne.", u: "@ayssaguel", rating: 5 },
+    { t: "Ce redesign me donne faim instantanément.", u: "@berthefoodie", rating: 4 },
+    { t: "Livraison rapide et poulet croustillant, top !", u: "@delphine", rating: 5 },
+  ]);
   const stores = [
     { n: "YoosFood Bonamoussadi", a: "Carrefour Maison Blanche", s: "Ouvert", km: "1.2 km", c: "text-green-400" },
     { n: "YoosFood Akwa", a: "Bd de la Liberté", s: "Ouvert", km: "2.1 km", c: "text-green-400" },
@@ -715,14 +857,19 @@ const PanelStory = () => {
             {/* avis */}
             <div>
               <p className="mb-2 text-xs font-bold tracking-[0.2em] text-gray-400">
-                CE QUE DISENT NOS CLIENTS
+                CE QUE DISENT NOS CLIENTS ({reviews.length})
               </p>
-              <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-                {reviews.map((r) => (
-                  <div key={r.u} className="rounded-xl border border-white/10 bg-black/40 p-3">
-                    <div className="mb-1 flex text-amber-400">
+              <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                {reviews.map((r, idx) => (
+                  <div key={`${r.u}-${idx}`} className="rounded-xl border border-white/10 bg-black/40 p-3">
+                    <div className="mb-1 flex">
                       {[0, 1, 2, 3, 4].map((i) => (
-                        <Star key={i} size={10} fill="currentColor" />
+                        <Star
+                          key={i}
+                          size={10}
+                          fill="currentColor"
+                          className={i < (r.rating || 5) ? "text-amber-400" : "text-gray-600"}
+                        />
                       ))}
                     </div>
                     <p className="text-[11px] text-white">"{r.t}"</p>
@@ -755,6 +902,11 @@ const PanelStory = () => {
               <button className="mt-3 flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-red-600 to-red-500 py-2 text-xs font-bold text-white">
                 <Navigation size={14} /> Utiliser ma position
               </button>
+            </div>
+
+            {/* formulaire d'avis — reste collé en bas (sticky) */}
+            <div className="sticky bottom-2 z-30 rounded-2xl border border-white/10 bg-black/80 p-3 shadow-2xl backdrop-blur">
+              <ReviewForm onAdd={(r) => setReviews((p) => [r, ...p])} />
             </div>
           </div>
         </div>
@@ -1080,6 +1232,13 @@ const HorizontalExperience = () => {
         .hide-scroll::-webkit-scrollbar { display: none; }
         @keyframes ttMarquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
         .tt-marquee { animation: ttMarquee 60s linear infinite; }
+        @keyframes ttHeart {
+          0% { transform: translateY(0) translateX(0) scale(0.5); opacity: 0; }
+          12% { opacity: 0.95; }
+          75% { opacity: 0.9; }
+          100% { transform: translateY(-108vh) translateX(var(--drift, 0)) scale(1.15); opacity: 0; }
+        }
+        .tt-heart { animation-name: ttHeart; animation-timing-function: linear; animation-iteration-count: infinite; will-change: transform, opacity; }
       `}</style>
     </div>
   );
