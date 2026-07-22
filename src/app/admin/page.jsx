@@ -150,7 +150,7 @@ export default function AdminPage() {
     <div className="flex min-h-screen bg-[#f6f7fb] text-gray-800">
       {/* ---- SIDEBAR ---- */}
       <aside
-        className={`fixed inset-y-0 left-0 z-40 w-64 shrink-0 border-r border-gray-100 bg-white transition-transform lg:static lg:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-40 w-64 shrink-0 border-r border-gray-100 bg-white transition-transform lg:sticky lg:top-0 lg:h-screen lg:translate-x-0 lg:self-start lg:overflow-y-auto ${
           mobileNav ? "translate-x-0" : "-translate-x-full"
         }`}
       >
