@@ -405,38 +405,71 @@ const PanelHero = () => {
   );
 };
 
-/* Pluie de cœurs (façon live TikTok) — montent en continu sur tout le panneau */
-const HEARTS = Array.from({ length: 26 }, (_, i) => {
+/* 3 styles de "like" façon réseaux sociaux (utilisés en même temps) */
+const LikeBadge = ({ size }) => (
+  <div
+    className="relative flex items-center gap-1 rounded-xl bg-red-600 px-2 shadow-lg"
+    style={{ height: size }}
+  >
+    <Heart size={size * 0.5} className="text-white" fill="currentColor" />
+    <span className="font-black leading-none text-white" style={{ fontSize: size * 0.42 }}>1</span>
+    <span className="absolute -bottom-1 left-3 h-2.5 w-2.5 rotate-45 rounded-[2px] bg-red-600" />
+  </div>
+);
+const LikeCircle = ({ size }) => (
+  <div
+    className="grid place-items-center rounded-full bg-gradient-to-br from-rose-400 to-red-500 shadow-lg"
+    style={{ width: size, height: size }}
+  >
+    <Heart size={size * 0.55} className="text-white" fill="currentColor" />
+  </div>
+);
+const LikeNeon = ({ size }) => (
+  <Heart
+    size={size}
+    className="text-black"
+    fill="currentColor"
+    style={{ filter: "drop-shadow(3px 3px 0 #22d3ee)" }}
+  />
+);
+const LIKE_VARIANTS = [LikeBadge, LikeCircle, LikeNeon];
+
+/* Likes qui montent en continu (façon live TikTok) — en ARRIÈRE-PLAN,
+   au même niveau que les vidéos de l'accueil (derrière le contenu). */
+const HEARTS = Array.from({ length: 27 }, (_, i) => {
   const r = (n) => {
     const x = Math.sin(i * 99.7 + n * 57.3) * 10000;
     return x - Math.floor(x);
   };
   return {
     left: `${(r(1) * 100).toFixed(1)}%`,
-    size: 14 + Math.round(r(2) * 28),
-    dur: (4 + r(3) * 5).toFixed(2),
-    delay: (r(4) * 7).toFixed(2),
+    size: 26 + Math.round(r(2) * 26),
+    dur: (4.5 + r(3) * 5).toFixed(2),
+    delay: (r(4) * 8).toFixed(2),
     drift: `${Math.round(r(5) * 80 - 40)}px`,
-    tone: ["text-red-500", "text-pink-400", "text-amber-400", "text-rose-300", "text-red-400"][i % 5],
+    variant: i % 3,
   };
 });
 
 const HeartsRain = () => (
-  <div className="pointer-events-none absolute inset-0 z-20 overflow-hidden">
-    {HEARTS.map((h, i) => (
-      <span
-        key={i}
-        className="tt-heart absolute -bottom-10"
-        style={{
-          left: h.left,
-          animationDuration: `${h.dur}s`,
-          animationDelay: `${h.delay}s`,
-          "--drift": h.drift,
-        }}
-      >
-        <Heart size={h.size} className={h.tone} fill="currentColor" />
-      </span>
-    ))}
+  <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
+    {HEARTS.map((h, i) => {
+      const Like = LIKE_VARIANTS[h.variant];
+      return (
+        <span
+          key={i}
+          className="tt-heart absolute -bottom-12"
+          style={{
+            left: h.left,
+            animationDuration: `${h.dur}s`,
+            animationDelay: `${h.delay}s`,
+            "--drift": h.drift,
+          }}
+        >
+          <Like size={h.size} />
+        </span>
+      );
+    })}
   </div>
 );
 
