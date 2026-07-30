@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import {
   ShoppingBag,
@@ -11,8 +11,11 @@ import {
   Utensils,
   MessageCircle,
   MapPin,
+  Check,
+  Loader2,
 } from "lucide-react";
 import { useCart, formatFCFA } from "../../context/CartContext";
+import CamilleService from "../../services/CamilleService";
 
 const logo = "/yfl1.png";
 const WHATSAPP = "237691175480";
@@ -20,7 +23,49 @@ const WHATSAPP = "237691175480";
 export default function CartPage() {
   const { items, setQty, removeItem, clear, count, total, ready } = useCart();
 
-  const order = () => {
+  const [form, setForm] = useState({ name: "", phone: "", address: "", note: "" });
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState("");
+  const [done, setDone] = useState(null);
+  const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
+
+  // Commande réelle : elle part chez Camille, qui envoie l'accusé de réception
+  // WhatsApp au client, prévient le commerçant et fait apparaître la commande
+  // dans son application. Le site n'a aucune base de données à lui.
+  const submit = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    if (!form.phone.replace(/[^0-9]/g, "")) {
+      setError("Indique ton numéro WhatsApp pour recevoir la confirmation.");
+      return;
+    }
+
+    setSending(true);
+    const r = await CamilleService.createOrder({
+      items: items.map((it) => ({
+        id: it.camilleId || undefined,
+        name: it.name,
+        qty: it.qty,
+        price: it.price,
+      })),
+      customer: { name: form.name, phone: form.phone },
+      delivery: { address: form.address },
+      note: form.note,
+    });
+    setSending(false);
+
+    if (!r.ok) {
+      setError(r.error || "La commande n'a pas pu être envoyée.");
+      return;
+    }
+    setDone(r.order || {});
+    clear();
+  };
+
+  // Repli WhatsApp : si Camille est injoignable, le client garde un moyen de
+  // commander plutôt qu'un cul-de-sac.
+  const orderOnWhatsApp = () => {
     const lines = items
       .map((it) => `• ${it.qty} × ${it.name} — ${formatFCFA(it.qty * it.price)}`)
       .join("\n");
@@ -57,7 +102,29 @@ export default function CartPage() {
           </div>
         </div>
 
-        {ready && items.length === 0 ? (
+        {done ? (
+          <div className="rounded-3xl border border-green-200 bg-white p-10 text-center shadow-sm">
+            <div className="mx-auto grid h-20 w-20 place-items-center rounded-full bg-green-100 text-green-600">
+              <Check size={38} />
+            </div>
+            <p className="mt-5 text-2xl font-black text-gray-900">Commande envoyée !</p>
+            {done.ref && (
+              <p className="mt-1 text-sm text-gray-500">
+                Référence <span className="font-black text-gray-900">{done.ref}</span>
+              </p>
+            )}
+            <p className="mx-auto mt-3 max-w-md text-sm text-gray-600">
+              Tu vas recevoir la confirmation sur WhatsApp au {form.phone}. Notre
+              équipe te rappelle pour la livraison.
+            </p>
+            <Link
+              href="/menu"
+              className="mt-6 inline-flex items-center gap-2 rounded-full bg-red-600 px-6 py-3 font-bold text-white shadow-lg shadow-red-600/30 transition hover:bg-red-700"
+            >
+              <Utensils size={18} /> Retour au menu
+            </Link>
+          </div>
+        ) : ready && items.length === 0 ? (
           <div className="rounded-3xl border-2 border-dashed border-gray-300 bg-white p-12 text-center">
             <div className="mx-auto grid h-20 w-20 place-items-center rounded-full bg-red-100 text-red-600">
               <ShoppingBag size={34} />
@@ -151,11 +218,63 @@ export default function CartPage() {
                     <span className="font-black text-red-600">{formatFCFA(total)}</span>
                   </div>
                 </div>
+                <form onSubmit={submit} className="mt-5 space-y-3">
+                  <input
+                    value={form.name}
+                    onChange={set("name")}
+                    placeholder="Ton nom"
+                    className="w-full rounded-xl border-2 border-gray-200 px-4 py-2.5 text-sm font-semibold outline-none focus:border-red-500"
+                  />
+                  <input
+                    value={form.phone}
+                    onChange={set("phone")}
+                    inputMode="tel"
+                    required
+                    placeholder="Numéro WhatsApp (ex. 6 91 17 54 80)"
+                    className="w-full rounded-xl border-2 border-gray-200 px-4 py-2.5 text-sm font-semibold outline-none focus:border-red-500"
+                  />
+                  <input
+                    value={form.address}
+                    onChange={set("address")}
+                    placeholder="Quartier / adresse de livraison"
+                    className="w-full rounded-xl border-2 border-gray-200 px-4 py-2.5 text-sm font-semibold outline-none focus:border-red-500"
+                  />
+                  <textarea
+                    value={form.note}
+                    onChange={set("note")}
+                    rows={2}
+                    placeholder="Une précision ? (facultatif)"
+                    className="w-full resize-none rounded-xl border-2 border-gray-200 px-4 py-2.5 text-sm font-semibold outline-none focus:border-red-500"
+                  />
+
+                  {error && (
+                    <p className="rounded-xl bg-red-50 px-3 py-2 text-xs font-semibold text-red-700">
+                      {error}
+                    </p>
+                  )}
+
+                  <button
+                    type="submit"
+                    disabled={sending}
+                    className="flex w-full items-center justify-center gap-2 rounded-full bg-red-600 py-3.5 font-bold text-white shadow-lg shadow-red-600/30 transition hover:bg-red-700 disabled:opacity-60"
+                  >
+                    {sending ? (
+                      <>
+                        <Loader2 size={18} className="animate-spin" /> Envoi…
+                      </>
+                    ) : (
+                      <>
+                        <ShoppingBag size={18} /> Valider ma commande
+                      </>
+                    )}
+                  </button>
+                </form>
+
                 <button
-                  onClick={order}
-                  className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-red-600 py-3.5 font-bold text-white shadow-lg shadow-red-600/30 transition hover:bg-red-700"
+                  onClick={orderOnWhatsApp}
+                  className="mt-2 flex w-full items-center justify-center gap-2 rounded-full border-2 border-gray-200 py-3 text-sm font-bold text-gray-700 transition hover:border-green-500 hover:text-green-600"
                 >
-                  <MessageCircle size={18} /> Commander sur WhatsApp
+                  <MessageCircle size={17} /> Commander sur WhatsApp
                 </button>
                 <p className="mt-3 flex items-center justify-center gap-1 text-xs text-gray-500">
                   <MapPin size={13} className="text-red-500" /> Livraison Douala & environs

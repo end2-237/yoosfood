@@ -42,7 +42,7 @@ import {
   Send,
 } from "lucide-react";
 import { useCart } from "../../context/CartContext";
-import { SupabaseService } from "../../services/SupabaseServices";
+import { useCamilleCatalog } from "../../hooks/useCamilleCatalog";
 
 // Le logo est servi depuis /public (fond détouré -> voir public/yfl1.png)
 const logo = "/yfl1.png";
@@ -332,7 +332,7 @@ const PanelHero = () => {
     { icon: Star, color: "from-amber-500 to-yellow-500", top: "Note Client", big: "4.9 ★", sub: "Basé sur 58K+ avis clients." },
   ];
 
-  const cats = [
+  const STATIC_CATS = [
     { label: "Pour Vous", icon: Flame },
     { label: "Buckets", icon: Drumstick },
     { label: "Burgers", icon: Beef },
@@ -352,7 +352,12 @@ const PanelHero = () => {
       setAnim("cat-in");
     }, 260);
   };
-  const products = PRODUCTS_BY_CAT[cats[cat].label] || [];
+  // Catalogue Camille dès qu'il répond ; sinon les catégories de démonstration.
+  const camille = useCamilleCatalog();
+  const cats = camille.live ? camille.cats : STATIC_CATS;
+  const byCat = camille.live ? camille.byCat : PRODUCTS_BY_CAT;
+  const safeCat = Math.min(cat, Math.max(0, cats.length - 1));
+  const products = byCat[cats[safeCat]?.label] || [];
 
   return (
     <div className="relative h-full w-full overflow-hidden bg-gradient-to-br from-[#3a0505] via-[#7a0d0d] to-[#4a0606]">
@@ -481,7 +486,7 @@ const PanelHero = () => {
                   key={c.label}
                   onClick={() => switchCat(i)}
                   className={`flex shrink-0 items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-semibold transition ${
-                    i === cat
+                    i === safeCat
                       ? "bg-gradient-to-r from-red-600 to-red-500 text-white"
                       : "text-gray-300 hover:text-white"
                   }`}
@@ -505,7 +510,7 @@ const PanelHero = () => {
                     </span>
                   )}
                   <p className="truncate text-sm font-bold text-white">{p.name}</p>
-                  <p className="text-sm font-black text-amber-400">{p.price}</p>
+                  <p className="text-sm font-black text-amber-400">{p.priceF || p.price}</p>
                 </div>
                 <Food
                   src={p.img}
@@ -515,7 +520,7 @@ const PanelHero = () => {
                   imgClass="rounded-xl object-cover"
                 />
                 <button
-                  onClick={() => addItem({ name: p.name, price: p.price, img: p.img })}
+                  onClick={() => addItem({ camilleId: p.camilleId, name: p.name, price: p.price, img: p.img })}
                   className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-red-600 text-white transition hover:scale-110"
                 >
                   <Plus size={14} />
@@ -602,7 +607,7 @@ const HeartsRain = () => (
 /* ================================================================== */
 const PanelMenu = () => {
   const { addItem } = useCart();
-  const cats = [
+  const STATIC_CATS = [
     { label: "Burgers", Icon: Beef },
     { label: "Buckets", Icon: Drumstick },
     { label: "Wraps", Icon: Sandwich },
@@ -611,6 +616,8 @@ const PanelMenu = () => {
     { label: "Menus Enfant", Icon: Cookie },
     { label: "Sauces", Icon: Salad },
   ];
+  const camille = useCamilleCatalog();
+  const cats = camille.live ? camille.cats : STATIC_CATS;
   const [cat, setCat] = useState(0);
   const [anim, setAnim] = useState("cat-in");
   const switchCat = (i) => {
@@ -621,7 +628,9 @@ const PanelMenu = () => {
       setAnim("cat-in");
     }, 260);
   };
-  const featured = PRODUCTS_BY_CAT[cats[cat].label] || [];
+  const safeCat = Math.min(cat, Math.max(0, cats.length - 1));
+  const byCat = camille.live ? camille.byCat : PRODUCTS_BY_CAT;
+  const featured = byCat[cats[safeCat]?.label] || [];
   const sauces = [
     { c: "bg-red-500", n: "Piquante" },
     { c: "bg-amber-400", n: "Miel" },
@@ -701,10 +710,10 @@ const PanelMenu = () => {
                   <div className="p-3">
                     <p className="truncate text-sm font-bold text-white">{f.name}</p>
                     <p className="text-[11px] text-gray-400">{f.meta}</p>
-                    <p className="mt-1 text-base font-black text-amber-400">{f.price}</p>
+                    <p className="mt-1 text-base font-black text-amber-400">{f.priceF || f.price}</p>
                   </div>
                   <button
-                    onClick={() => addItem({ name: f.name, price: f.price, img: f.img })}
+                    onClick={() => addItem({ camilleId: f.camilleId, name: f.name, price: f.price, img: f.img })}
                     className="absolute bottom-3 right-2 grid h-7 w-7 place-items-center rounded-full bg-white text-red-600 transition hover:scale-110"
                   >
                     <Plus size={15} />
@@ -724,7 +733,7 @@ const PanelMenu = () => {
                 key={c.label}
                 onClick={() => switchCat(i)}
                 className={`flex shrink-0 items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition ${
-                  i === cat
+                  i === safeCat
                     ? "bg-gradient-to-r from-red-600 to-red-500 text-white"
                     : "border border-white/10 bg-black/20 text-gray-300 hover:text-white"
                 }`}
@@ -930,18 +939,6 @@ const ReviewForm = ({ onAdd }) => {
     if (!name.trim() || !comment.trim()) return;
     const clean = name.trim();
     onAdd({ t: comment.trim(), u: "@" + clean.toLowerCase().replace(/\s+/g, ""), rating });
-    try {
-      await SupabaseService.addReview({
-        name: clean,
-        role: "Client",
-        rating,
-        comment: comment.trim(),
-        avatar: clean.slice(0, 2).toUpperCase(),
-        approved: false,
-      });
-    } catch (e2) {
-      /* hors-ligne : l'avis reste affiché localement */
-    }
     setName("");
     setComment("");
     setRating(5);

@@ -26,6 +26,7 @@ import {
 } from "lucide-react";
 import { useCart, formatFCFA } from "../../../context/CartContext";
 import { getProduct, relatedProducts } from "../../../data/menu";
+import { useCamilleCatalog } from "../../../hooks/useCamilleCatalog";
 
 const logo = "/yfl1.png";
 const priceNum = (p) => Number(String(p).replace(/[^\d]/g, "")) || 0;
@@ -92,9 +93,24 @@ function MiniHeader() {
 export default function ProductPage() {
   const params = useParams();
   const slug = Array.isArray(params.slug) ? params.slug[0] : params.slug;
-  const product = getProduct(slug);
   const { addItem, openCart } = useCart();
   const [qty, setQty] = useState(1);
+
+  // Produit cherché d'abord dans le catalogue Camille, puis dans le menu du
+  // site. L'ordre compte : un produit modifié dans Camille doit gagner.
+  const camille = useCamilleCatalog();
+  const product =
+    (camille.live && camille.products.find((p) => p.slug === slug)) || getProduct(slug);
+
+  // Tant que Camille n'a pas répondu, on n'annonce pas "introuvable" : le
+  // produit existe peut-être et n'est simplement pas encore chargé.
+  if (!product && !camille.ready) {
+    return (
+      <main className="grid min-h-screen place-items-center bg-[#fff8ef] px-6 text-center">
+        <p className="text-sm font-bold text-gray-500">Chargement du produit…</p>
+      </main>
+    );
+  }
 
   if (!product) {
     return (
@@ -109,13 +125,19 @@ export default function ProductPage() {
     );
   }
 
-  const related = relatedProducts(product, 4);
+  const related =
+    camille.live && product.camilleId
+      ? camille.products
+          .filter((p) => p.categoryId === product.categoryId && p.slug !== product.slug)
+          .slice(0, 4)
+      : relatedProducts(product, 4);
   const Icon = product.Icon || Utensils;
   const totalPrice = priceNum(product.price) * qty;
 
-  const add = () => addItem({ name: product.name, price: product.price, img: product.img }, qty);
+  const add = () =>
+    addItem({ camilleId: product.camilleId, name: product.name, price: product.price, img: product.img }, qty);
 
-  const ingredients = product.desc.split(/,\s*/).filter(Boolean);
+  const ingredients = String(product.desc || "").split(/,\s*/).filter(Boolean);
   const features = [
     { Icon: Truck, t: "Livraison rapide", s: "30–45 min" },
     { Icon: Flame, t: "Chaud & frais", s: "Cuit à la commande" },
@@ -242,7 +264,7 @@ export default function ProductPage() {
                         <p className="text-sm font-black text-red-600">{p.price} FCFA</p>
                         <button
                           onClick={() => {
-                            addItem({ name: p.name, price: p.price, img: p.img });
+                            addItem({ camilleId: p.camilleId, name: p.name, price: p.price, img: p.img });
                           }}
                           aria-label="Ajouter"
                           className="grid h-8 w-8 place-items-center rounded-full bg-gray-900 text-white transition hover:bg-red-600"

@@ -3,7 +3,8 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useCart } from "../../context/CartContext";
-import { IMG, BANNERS, CATEGORIES } from "../../data/menu";
+import { IMG, BANNERS, CATEGORIES as STATIC_CATEGORIES } from "../../data/menu";
+import { useCamilleCatalog } from "../../hooks/useCamilleCatalog";
 import {
   Phone,
   User,
@@ -386,8 +387,13 @@ function Promos() {
 /*  CUSTOMER FAVOURITES — LE MENU COMPLET                          */
 /* ================================================================ */
 function Favourites() {
-  const [active, setActive] = useState("chicken");
+  const [active, setActive] = useState(null);
   const { addItem } = useCart();
+
+  // Le catalogue vient de Camille : une seule saisie de produits alimente
+  // WhatsApp et ce site. Tant qu'il n'a rien renvoyé, on montre le menu du site.
+  const camille = useCamilleCatalog();
+  const CATEGORIES = camille.live ? camille.cats : STATIC_CATEGORIES;
   const current = CATEGORIES.find((c) => c.id === active) || CATEGORIES[0];
 
   return (
@@ -455,7 +461,7 @@ function Favourites() {
                 </div>
               </Link>
               <button
-                onClick={() => addItem({ name: item.name, price: item.price, img: item.img })}
+                onClick={() => addItem({ camilleId: item.camilleId, name: item.name, price: item.price, img: item.img })}
                 aria-label="Ajouter au panier"
                 className="grid h-9 w-9 shrink-0 place-items-center self-center rounded-full bg-red-600 text-white transition hover:scale-110 hover:bg-red-700"
               >
@@ -651,7 +657,7 @@ function Footer() {
         <div>
           <p className="mb-3 text-sm font-black uppercase tracking-wide text-white">Menu</p>
           <ul className="space-y-2 text-sm">
-            {CATEGORIES.map((c) => (
+            {STATIC_CATEGORIES.map((c) => (
               <li key={c.id}>
                 <a href="#menu" className="transition hover:text-red-400">{c.label}</a>
               </li>

@@ -7,7 +7,7 @@ const CartContext = createContext(null);
 const toNumber = (p) => Number(String(p).replace(/[^\d.,]/g, "").replace(/\s/g, "").replace(",", ".")) || 0;
 
 export function CartProvider({ children }) {
-  const [items, setItems] = useState([]); // { id, name, price:number, img, qty }
+  const [items, setItems] = useState([]); // { id, camilleId, name, price:number, img, qty }
   const [ready, setReady] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -41,7 +41,9 @@ export function CartProvider({ children }) {
         copy[idx] = { ...copy[idx], qty: copy[idx].qty + qty };
         return copy;
       }
-      return [...prev, { id, name: item.name, price, img: item.img || "", qty }];
+      // camilleId : l'identifiant produit côté Camille. Conservé jusqu'à la
+      // commande pour que Camille relise le prix en base (le navigateur ment).
+      return [...prev, { id, camilleId: item.camilleId || null, name: item.name, price, img: item.img || "", qty }];
     });
     setIsOpen(true); // ouvre le panier-tiroir à chaque ajout (intuitif)
   };
