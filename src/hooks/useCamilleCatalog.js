@@ -108,6 +108,20 @@ function group(items) {
  *          `live` vaut false tant que Camille n'a rien fourni : les vues
  *          doivent alors conserver leur catalogue statique.
  */
+// Le tiroir panier est monté sur toutes les pages, en plus des vues qui
+// listent les produits : sans mise en commun, chaque page ferait deux appels
+// identiques. On partage la promesse pour la durée de vie de l'onglet.
+let inflight = null;
+function fetchCatalogOnce() {
+  if (!inflight) {
+    inflight = CamilleService.getProducts({ limit: 100 }).catch((e) => {
+      inflight = null;
+      return { products: [], merchant: {}, total: 0, error: e.message };
+    });
+  }
+  return inflight;
+}
+
 export function useCamilleCatalog() {
   const [state, setState] = useState({
     ready: false,
@@ -115,6 +129,7 @@ export function useCamilleCatalog() {
     products: [],
     cats: [],
     byCat: {},
+    merchant: {},
     error: "",
   });
 
@@ -124,14 +139,20 @@ export function useCamilleCatalog() {
       setState((s) => ({ ...s, ready: true, error: "clé publique Camille absente" }));
       return;
     }
-    CamilleService.getProducts({ limit: 100 }).then((r) => {
+    fetchCatalogOnce().then((r) => {
       if (cancelled) return;
       const products = (r.products || []).map(toItem);
       if (!products.length) {
-        setState({ ready: true, live: false, products: [], cats: [], byCat: {}, error: r.error || "" });
+        setState({
+          ready: true, live: false, products: [], cats: [], byCat: {},
+          merchant: r.merchant || {}, error: r.error || "",
+        });
         return;
       }
-      setState({ ready: true, live: true, products, ...group(products), error: "" });
+      setState({
+        ready: true, live: true, products, ...group(products),
+        merchant: r.merchant || {}, error: "",
+      });
     });
     return () => {
       cancelled = true;

@@ -18,7 +18,7 @@ const KEY = process.env.CAMILLE_SECRET_KEY || process.env.NEXT_PUBLIC_CAMILLE_PU
 export async function GET(request) {
   if (!KEY) {
     return NextResponse.json(
-      { products: [], total: 0, error: "Aucune clé Camille configurée côté serveur." },
+      { products: [], merchant: {}, total: 0, error: "Aucune clé Camille configurée côté serveur." },
       { status: 503 }
     );
   }
@@ -38,19 +38,19 @@ export async function GET(request) {
     const d = await res.json().catch(() => ({}));
     if (!res.ok || d.error) {
       return NextResponse.json(
-        { products: [], total: 0, error: d.error || `Camille a répondu ${res.status}` },
+        { products: [], merchant: {}, total: 0, error: d.error || `Camille a répondu ${res.status}` },
         { status: res.ok ? 502 : res.status }
       );
     }
     return NextResponse.json(
-      { products: d.products || [], total: d.total ?? 0 },
+      { products: d.products || [], merchant: d.merchant || {}, total: d.total ?? 0 },
       // Une minute de cache : le catalogue change rarement, et cela évite de
       // frapper Camille à chaque visiteur.
       { headers: { "Cache-Control": "s-maxage=60, stale-while-revalidate=300" } }
     );
   } catch (e) {
     return NextResponse.json(
-      { products: [], total: 0, error: `Camille injoignable : ${e.message}` },
+      { products: [], merchant: {}, total: 0, error: `Camille injoignable : ${e.message}` },
       { status: 502 }
     );
   }

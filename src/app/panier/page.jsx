@@ -16,12 +16,16 @@ import {
 } from "lucide-react";
 import { useCart, formatFCFA } from "../../context/CartContext";
 import CamilleService from "../../services/CamilleService";
+import { useCamilleCatalog } from "../../hooks/useCamilleCatalog";
 
 const logo = "/yfl1.png";
-const WHATSAPP = "237691175480";
+// Repli seulement : le numéro fait autorité côté agent Camille.
+const WHATSAPP_FALLBACK = "237691175480";
 
 export default function CartPage() {
   const { items, setQty, removeItem, clear, count, total, ready } = useCart();
+  const { merchant } = useCamilleCatalog();
+  const whatsapp = String(merchant?.whatsapp || WHATSAPP_FALLBACK).replace(/[^0-9]/g, "");
 
   const [form, setForm] = useState({ name: "", phone: "", address: "", note: "" });
   const [sending, setSending] = useState(false);
@@ -72,7 +76,7 @@ export default function CartPage() {
     const msg = `Bonjour YossFood ! Je souhaite commander :\n\n${lines}\n\nTotal : ${formatFCFA(
       total
     )}\n\nMerci !`;
-    window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`, "_blank");
+    window.open(`https://wa.me/${whatsapp}?text=${encodeURIComponent(msg)}`, "_blank");
   };
 
   return (

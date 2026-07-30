@@ -21,8 +21,11 @@ import {
   Beef,
 } from "lucide-react";
 import { useCart, formatFCFA } from "../context/CartContext";
+import { useCamilleCatalog } from "../hooks/useCamilleCatalog";
 
-const WHATSAPP = "237691175480";
+// Repli seulement : le numéro fait autorité côté agent Camille. Il ne sert
+// que le temps du chargement, ou si l'agent n'en déclare aucun.
+const WHATSAPP_FALLBACK = "237691175480";
 const FREE_DELIVERY = 5000;
 
 /* doodles food subtils en fond du tiroir */
@@ -43,6 +46,8 @@ const DOODLES = Array.from({ length: 16 }, (_, i) => {
 
 export default function CartDrawer() {
   const { items, isOpen, closeCart, setQty, removeItem, total, count } = useCart();
+  const { merchant } = useCamilleCatalog();
+  const whatsapp = String(merchant?.whatsapp || WHATSAPP_FALLBACK).replace(/[^0-9]/g, "");
 
   const order = () => {
     if (!items.length) return;
@@ -52,7 +57,7 @@ export default function CartDrawer() {
     const msg = `Bonjour YossFood ! Je souhaite commander :\n\n${lines}\n\nTotal : ${formatFCFA(
       total
     )}\n\nMerci !`;
-    window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`, "_blank");
+    window.open(`https://wa.me/${whatsapp}?text=${encodeURIComponent(msg)}`, "_blank");
   };
 
   const remaining = Math.max(0, FREE_DELIVERY - total);

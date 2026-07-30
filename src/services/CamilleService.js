@@ -66,7 +66,7 @@ export const CamilleService = {
   /**
    * Catalogue de l'agent lié à la clé.
    * @param {{ q?: string, category?: string, limit?: number, offset?: number }} opts
-   * @returns {Promise<{products: object[], total: number, error?: string}>}
+   * @returns {Promise<{products: object[], merchant: object, total: number, error?: string}>}
    */
   async getProducts(opts = {}) {
     const qs = new URLSearchParams();
@@ -99,11 +99,17 @@ export const CamilleService = {
       }
 
       if (!res.ok || d.error) {
-        return { products: [], total: 0, error: d.error || `HTTP ${res.status}` };
+        return { products: [], merchant: {}, total: 0, error: d.error || `HTTP ${res.status}` };
       }
-      return { products: (d.products || []).map(adapt), total: d.total ?? 0 };
+      return {
+        products: (d.products || []).map(adapt),
+        // Coordonnées du marchand telles que configurées sur l'agent : c'est
+        // lui qui fait autorité sur son numéro WhatsApp, pas ce site.
+        merchant: d.merchant || {},
+        total: d.total ?? 0,
+      };
     } catch (e) {
-      return { products: [], total: 0, error: e.message };
+      return { products: [], merchant: {}, total: 0, error: e.message };
     }
   },
 
