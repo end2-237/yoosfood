@@ -67,15 +67,11 @@ export default function CartPage() {
     clear();
   };
 
-  // Repli WhatsApp : si Camille est injoignable, le client garde un moyen de
-  // commander plutôt qu'un cul-de-sac.
-  const orderOnWhatsApp = () => {
-    const lines = items
-      .map((it) => `• ${it.qty} × ${it.name} — ${formatFCFA(it.qty * it.price)}`)
-      .join("\n");
-    const msg = `Bonjour YossFood ! Je souhaite commander :\n\n${lines}\n\nTotal : ${formatFCFA(
-      total
-    )}\n\nMerci !`;
+  // WhatsApp ouvre une conversation, il ne prend pas la commande : celle-ci
+  // passe par l'API Camille juste au-dessus. Envoyer le panier en texte
+  // obligeait l'agent à le reconstituer à la lecture, et il s'y trompait.
+  const askOnWhatsApp = () => {
+    const msg = "Bonjour ! J'ai une question avant de commander.";
     window.open(`https://wa.me/${whatsapp}?text=${encodeURIComponent(msg)}`, "_blank");
   };
 
@@ -275,10 +271,10 @@ export default function CartPage() {
                 </form>
 
                 <button
-                  onClick={orderOnWhatsApp}
+                  onClick={askOnWhatsApp}
                   className="mt-2 flex w-full items-center justify-center gap-2 rounded-full border-2 border-gray-200 py-3 text-sm font-bold text-gray-700 transition hover:border-green-500 hover:text-green-600"
                 >
-                  <MessageCircle size={17} /> Commander sur WhatsApp
+                  <MessageCircle size={17} /> Une question ? Écris-nous
                 </button>
                 <p className="mt-3 flex items-center justify-center gap-1 text-xs text-gray-500">
                   <MapPin size={13} className="text-red-500" /> Livraison Douala & environs

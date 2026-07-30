@@ -49,14 +49,11 @@ export default function CartDrawer() {
   const { merchant } = useCamilleCatalog();
   const whatsapp = String(merchant?.whatsapp || WHATSAPP_FALLBACK).replace(/[^0-9]/g, "");
 
-  const order = () => {
-    if (!items.length) return;
-    const lines = items
-      .map((it) => `• ${it.qty} × ${it.name} — ${formatFCFA(it.qty * it.price)}`)
-      .join("\n");
-    const msg = `Bonjour YossFood ! Je souhaite commander :\n\n${lines}\n\nTotal : ${formatFCFA(
-      total
-    )}\n\nMerci !`;
+  // WhatsApp sert à poser une question, pas à commander : une commande passe
+  // par la caisse, donc par l'API Camille. Coller le panier ici obligeait
+  // l'agent à redevenir le panier déjà constitué, et il en perdait la moitié.
+  const askOnWhatsApp = () => {
+    const msg = "Bonjour ! J'ai une question à propos de ma commande.";
     window.open(`https://wa.me/${whatsapp}?text=${encodeURIComponent(msg)}`, "_blank");
   };
 
@@ -227,18 +224,19 @@ export default function CartDrawer() {
                   </span>
                 </div>
               </div>
-              <button
-                onClick={order}
+              <Link
+                href="/panier"
+                onClick={closeCart}
                 className="mt-4 flex w-full items-center justify-center gap-2 rounded-full bg-gradient-to-r from-red-600 to-red-500 py-3.5 font-bold text-white shadow-lg shadow-red-900/40 transition hover:scale-[1.02]"
               >
-                <MessageCircle size={18} /> Commander sur WhatsApp
-              </button>
+                <ShoppingBag size={18} /> Commander
+              </Link>
               <div className="mt-2 flex items-center justify-center gap-4 text-xs font-semibold text-gray-400">
                 <button onClick={closeCart} className="transition hover:text-white">Continuer</button>
                 <span className="h-3 w-px bg-white/15" />
-                <Link href="/panier" onClick={closeCart} className="flex items-center gap-1 transition hover:text-white">
-                  Panier complet <ChevronRight size={13} />
-                </Link>
+                <button onClick={askOnWhatsApp} className="flex items-center gap-1 transition hover:text-white">
+                  <MessageCircle size={13} /> Une question ?
+                </button>
               </div>
             </footer>
           </>
