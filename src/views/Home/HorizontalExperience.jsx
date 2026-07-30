@@ -43,6 +43,12 @@ import {
 } from "lucide-react";
 import { useCart } from "../../context/CartContext";
 import { useCamilleCatalog } from "../../hooks/useCamilleCatalog";
+import {
+  DarkProductRowSkeleton,
+  DarkFeaturedSkeleton,
+  Shimmer,
+  Repeat,
+} from "../../components/Skeleton";
 
 // Le logo est servi depuis /public (fond détouré -> voir public/yfl1.png)
 const logo = "/yfl1.png";
@@ -479,7 +485,10 @@ const PanelHero = () => {
         {/* Rangée basse : catégories + produits */}
         <div className="mt-6 lg:mt-4">
           <div className="hide-scroll mb-3 flex items-center gap-2 overflow-x-auto pb-1">
-            {cats.map((c, i) => {
+            {!camille.ready && (
+              <Repeat n={5}><Shimmer dark className="h-8 w-28 shrink-0 rounded-full" /></Repeat>
+            )}
+            {camille.ready && cats.map((c, i) => {
               const Icon = c.icon;
               return (
                 <button
@@ -498,7 +507,8 @@ const PanelHero = () => {
             })}
           </div>
           <div className={`grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-4 ${anim}`}>
-            {products.map((p) => (
+            {!camille.ready && <Repeat n={4}><DarkProductRowSkeleton /></Repeat>}
+            {camille.ready && products.map((p) => (
               <div
                 key={p.name}
                 className="flex items-center gap-3 rounded-2xl border border-white/10 bg-black/30 p-2.5 backdrop-blur transition hover:bg-black/50"
@@ -688,7 +698,8 @@ const PanelMenu = () => {
               MENUS VEDETTES —
             </p>
             <div className={`hide-scroll flex gap-3 overflow-x-auto pb-2 ${anim}`}>
-              {featured.map((f, i) => (
+              {!camille.ready && <Repeat n={4}><DarkFeaturedSkeleton /></Repeat>}
+              {camille.ready && featured.map((f, i) => (
                 <div
                   key={f.name}
                   className={`relative w-40 shrink-0 overflow-hidden rounded-2xl border bg-black/40 backdrop-blur sm:w-44 ${
@@ -726,7 +737,10 @@ const PanelMenu = () => {
 
         {/* catégories */}
         <div className="hide-scroll my-4 flex gap-2 overflow-x-auto">
-          {cats.map((c, i) => {
+          {!camille.ready && (
+            <Repeat n={5}><Shimmer dark className="h-9 w-28 shrink-0 rounded-full" /></Repeat>
+          )}
+          {camille.ready && cats.map((c, i) => {
             const Icon = c.Icon;
             return (
               <button

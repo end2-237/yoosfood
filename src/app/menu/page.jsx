@@ -6,6 +6,11 @@ import { useCart } from "../../context/CartContext";
 import { IMG, BANNERS, CATEGORIES as STATIC_CATEGORIES } from "../../data/menu";
 import { useCamilleCatalog } from "../../hooks/useCamilleCatalog";
 import {
+  ProductCardSkeleton,
+  CategoryTabSkeleton,
+  Repeat,
+} from "../../components/Skeleton";
+import {
   Phone,
   User,
   ShoppingBag,
@@ -412,7 +417,8 @@ function Favourites() {
 
         {/* onglets catégories avec vignettes photo */}
         <div className="hide-scroll mt-8 flex items-stretch justify-start gap-3 overflow-x-auto pb-2 sm:justify-center">
-          {CATEGORIES.map((c) => {
+          {!camille.ready && <Repeat n={5}><CategoryTabSkeleton /></Repeat>}
+          {camille.ready && CATEGORIES.map((c) => {
             const on = c.id === active;
             return (
               <button
@@ -439,7 +445,8 @@ function Favourites() {
 
         {/* grille produits */}
         <div className="mt-10 grid gap-5 md:grid-cols-2">
-          {current.items.map((item) => (
+          {!camille.ready && <Repeat n={6}><ProductCardSkeleton /></Repeat>}
+          {camille.ready && current.items.map((item) => (
             <article
               key={item.name}
               className="flex items-center gap-4 rounded-2xl border-2 border-dashed border-gray-300 bg-white p-3 transition hover:border-red-400 hover:shadow-md"

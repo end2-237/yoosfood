@@ -27,6 +27,7 @@ import {
 import { useCart, formatFCFA } from "../../../context/CartContext";
 import { getProduct, relatedProducts } from "../../../data/menu";
 import { useCamilleCatalog } from "../../../hooks/useCamilleCatalog";
+import { Shimmer, Repeat } from "../../../components/Skeleton";
 
 const logo = "/yfl1.png";
 const priceNum = (p) => Number(String(p).replace(/[^\d]/g, "")) || 0;
@@ -106,8 +107,27 @@ export default function ProductPage() {
   // produit existe peut-être et n'est simplement pas encore chargé.
   if (!product && !camille.ready) {
     return (
-      <main className="grid min-h-screen place-items-center bg-[#fff8ef] px-6 text-center">
-        <p className="text-sm font-bold text-gray-500">Chargement du produit…</p>
+      <main className="min-h-screen w-full bg-[#fff8ef]">
+        <MiniHeader />
+        <div className="mx-auto max-w-6xl px-4 py-6 md:px-6 md:py-10">
+          <div className="grid items-start gap-8 lg:grid-cols-2">
+            <Shimmer className="aspect-square w-full rounded-3xl" />
+            <div className="space-y-4">
+              <Shimmer className="h-6 w-32 rounded-md" />
+              <Shimmer className="h-12 w-4/5 rounded-lg" />
+              <Shimmer className="h-4 w-full rounded-md" />
+              <Shimmer className="h-4 w-2/3 rounded-md" />
+              <Shimmer className="h-10 w-40 rounded-lg" />
+              <div className="flex gap-3 pt-2">
+                <Shimmer className="h-12 w-32 rounded-full" />
+                <Shimmer className="h-12 flex-1 rounded-full" />
+              </div>
+              <div className="grid grid-cols-3 gap-3 pt-2">
+                <Repeat n={3}><Shimmer className="h-20 rounded-2xl" /></Repeat>
+              </div>
+            </div>
+          </div>
+        </div>
       </main>
     );
   }

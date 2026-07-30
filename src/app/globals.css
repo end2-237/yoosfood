@@ -5,3 +5,48 @@ body {
   padding: 0;
   margin: 0;
 }
+
+/* Squelettes de chargement : un reflet qui traverse le bloc. */
+.yf-shimmer {
+  position: relative;
+  overflow: hidden;
+  background: #eceae6;
+}
+.yf-shimmer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.85),
+    transparent
+  );
+  animation: yf-shimmer 1.4s infinite;
+}
+.yf-shimmer-dark {
+  background: rgba(255, 255, 255, 0.07);
+}
+.yf-shimmer-dark::after {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.13),
+    transparent
+  );
+}
+
+@keyframes yf-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Un reflet qui balaie l'écran en boucle n'apporte rien à qui est gêné par
+   le mouvement — et peut le rendre malade. On garde le bloc, sans l'animer. */
+@media (prefers-reduced-motion: reduce) {
+  .yf-shimmer::after {
+    animation: none;
+  }
+}
