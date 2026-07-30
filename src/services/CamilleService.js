@@ -75,18 +75,29 @@ export const CamilleService = {
     qs.set("limit", String(opts.limit ?? 100));
     if (opts.offset) qs.set("offset", String(opts.offset));
 
-    // Sans clé publique, on lit via notre relais serveur (clé secrète côté
-    // serveur uniquement) plutôt que de renoncer au catalogue.
-    const url = PUBLIC_KEY
-      ? `${CAMILLE_URL}/api/public/v1/catalog?${qs}`
-      : `/api/catalogue?${qs}`;
-
-    try {
-      const res = await fetch(url, {
-        headers: PUBLIC_KEY ? { "X-Camille-Key": PUBLIC_KEY } : {},
+    // Lecture directe si une clé publique est configurée, sinon via notre
+    // relais serveur (clé secrète côté serveur uniquement).
+    const direct = async () => {
+      const res = await fetch(`${CAMILLE_URL}/api/public/v1/catalog?${qs}`, {
+        headers: { "X-Camille-Key": PUBLIC_KEY },
         cache: "no-store",
       });
-      const d = await res.json();
+      return { res, d: await res.json().catch(() => ({})) };
+    };
+    const viaRelay = async () => {
+      const res = await fetch(`/api/catalogue?${qs}`, { cache: "no-store" });
+      return { res, d: await res.json().catch(() => ({})) };
+    };
+
+    try {
+      let { res, d } = PUBLIC_KEY ? await direct() : await viaRelay();
+
+      // Une clé publique périmée, révoquée ou mal recopiée ne doit pas vider
+      // la boutique : on repasse par le relais, qui porte la clé secrète.
+      if (PUBLIC_KEY && (res.status === 401 || res.status === 403)) {
+        ({ res, d } = await viaRelay());
+      }
+
       if (!res.ok || d.error) {
         return { products: [], total: 0, error: d.error || `HTTP ${res.status}` };
       }
