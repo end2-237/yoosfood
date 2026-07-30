@@ -9,6 +9,7 @@
 // alerte au commerçant, apparition dans l'app, bon de commande PDF.
 // ─────────────────────────────────────────────────────────────────────────────
 import { NextResponse } from "next/server";
+import { normalizePhone } from "../../../lib/phone";
 
 const CAMILLE_URL = (
   process.env.NEXT_PUBLIC_CAMILLE_URL || "https://camille.vps.buyticle.com"
@@ -31,13 +32,13 @@ export async function POST(request) {
     return NextResponse.json({ error: "Ton panier est vide." }, { status: 400 });
   }
 
-  const phone = String(body.customer?.phone || "").replace(/[^0-9]/g, "");
-  if (!phone) {
-    return NextResponse.json(
-      { error: "Un numéro de téléphone est nécessaire pour te confirmer la commande." },
-      { status: 400 }
-    );
+  // Un numéro sans indicatif pays ne recevra jamais l'accusé WhatsApp : mieux
+  // vaut refuser la commande ici que la créer et la laisser sans confirmation.
+  const tel = normalizePhone(body.customer?.phone);
+  if (tel.error) {
+    return NextResponse.json({ error: tel.error }, { status: 400 });
   }
+  const phone = tel.phone;
 
   try {
     const res = await fetch(`${CAMILLE_URL}/api/public/v1/orders`, {

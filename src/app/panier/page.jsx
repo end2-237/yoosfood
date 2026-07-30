@@ -17,6 +17,7 @@ import {
 import { useCart, formatFCFA } from "../../context/CartContext";
 import CamilleService from "../../services/CamilleService";
 import { useCamilleCatalog } from "../../hooks/useCamilleCatalog";
+import { normalizePhone, displayPhone } from "../../lib/phone";
 
 const logo = "/yfl1.png";
 // Repli seulement : le numéro fait autorité côté agent Camille.
@@ -40,8 +41,9 @@ export default function CartPage() {
     e.preventDefault();
     setError("");
 
-    if (!form.phone.replace(/[^0-9]/g, "")) {
-      setError("Indique ton numéro WhatsApp pour recevoir la confirmation.");
+    const tel = normalizePhone(form.phone);
+    if (tel.error) {
+      setError(tel.error);
       return;
     }
 
@@ -53,7 +55,7 @@ export default function CartPage() {
         qty: it.qty,
         price: it.price,
       })),
-      customer: { name: form.name, phone: form.phone },
+      customer: { name: form.name, phone: tel.phone },
       delivery: { address: form.address },
       note: form.note,
     });
@@ -114,8 +116,11 @@ export default function CartPage() {
               </p>
             )}
             <p className="mx-auto mt-3 max-w-md text-sm text-gray-600">
-              Tu vas recevoir la confirmation sur WhatsApp au {form.phone}. Notre
-              équipe te rappelle pour la livraison.
+              Tu vas recevoir la confirmation sur WhatsApp au{" "}
+              <span className="font-black text-gray-900">
+                {displayPhone(normalizePhone(form.phone).phone || "")}
+              </span>
+              . Notre équipe te rappelle pour la livraison.
             </p>
             <Link
               href="/menu"
@@ -230,7 +235,7 @@ export default function CartPage() {
                     onChange={set("phone")}
                     inputMode="tel"
                     required
-                    placeholder="Numéro WhatsApp (ex. 6 91 17 54 80)"
+                    placeholder="WhatsApp avec indicatif (ex. 237 6 91 17 54 80)"
                     className="w-full rounded-xl border-2 border-gray-200 px-4 py-2.5 text-sm font-semibold outline-none focus:border-red-500"
                   />
                   <input
