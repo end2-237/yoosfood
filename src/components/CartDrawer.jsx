@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import Link from "next/link";
 import {
   X,
@@ -45,8 +45,13 @@ const DOODLES = Array.from({ length: 16 }, (_, i) => {
 });
 
 export default function CartDrawer() {
-  const { items, isOpen, closeCart, setQty, removeItem, total, count } = useCart();
-  const { merchant } = useCamilleCatalog();
+  const { items, isOpen, closeCart, setQty, removeItem, total, count, pruneMissing } = useCart();
+  const { merchant, products, live } = useCamilleCatalog();
+
+  // Le catalogue vient d'arriver : on écarte les lignes qu'il ne contient plus.
+  useEffect(() => {
+    if (live) pruneMissing(products.map((p) => p.camilleId).filter(Boolean));
+  }, [live, products]);
   const whatsapp = String(merchant?.whatsapp || WHATSAPP_FALLBACK).replace(/[^0-9]/g, "");
 
   // WhatsApp sert à poser une question, pas à commander : une commande passe

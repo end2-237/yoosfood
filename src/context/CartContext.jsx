@@ -57,12 +57,31 @@ export function CartProvider({ children }) {
     setItems((prev) => prev.map((x) => (x.id === id ? { ...x, qty: Math.max(1, qty) } : x)));
   const clear = () => setItems([]);
 
+  /**
+   * Retire les lignes dont le produit n'existe plus dans le catalogue Camille.
+   *
+   * Le panier survit dans localStorage. Si le marchand change de compte, ou
+   * supprime un produit, les identifiants gardés ici appartiennent à un
+   * catalogue qui n'est plus le sien : Camille refuse alors la commande avec
+   * « Produit introuvable », et le client reste bloqué sans comprendre.
+   * On préfère perdre une ligne en silence qu'un client à la caisse.
+   *
+   * @param {string[]} validIds identifiants présents dans le catalogue courant
+   */
+  const pruneMissing = (validIds) => {
+    if (!Array.isArray(validIds) || !validIds.length) return;
+    const known = new Set(validIds);
+    setItems((prev) =>
+      prev.filter((x) => !x.camilleId || known.has(x.camilleId))
+    );
+  };
+
   const count = items.reduce((s, x) => s + x.qty, 0);
   const total = items.reduce((s, x) => s + x.qty * x.price, 0);
 
   return (
     <CartContext.Provider
-      value={{ items, addItem, removeItem, setQty, clear, count, total, ready, isOpen, openCart, closeCart, toggleCart }}
+      value={{ items, addItem, removeItem, setQty, clear, pruneMissing, count, total, ready, isOpen, openCart, closeCart, toggleCart }}
     >
       {children}
     </CartContext.Provider>
