@@ -9,7 +9,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 import React from "react";
 
-import PublicSite from "./views/Home";
+import PublicSite from "./views/Accueil";
 
 const YossFoodApp = () => <PublicSite />;
 

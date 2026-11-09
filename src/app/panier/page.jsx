@@ -32,7 +32,20 @@ export default function CartPage() {
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
   const [done, setDone] = useState(null);
+  const [pos, setPos] = useState(null); // { lat, lng } partagée par le client
+  const [locMsg, setLocMsg] = useState("");
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
+
+  // Position du client : le livreur sait où aller, la boutique estime le prix.
+  const localiser = () => {
+    if (!navigator.geolocation) { setLocMsg("Localisation indisponible sur cet appareil."); return; }
+    setLocMsg("Localisation en cours…");
+    navigator.geolocation.getCurrentPosition(
+      (p) => { setPos({ lat: p.coords.latitude, lng: p.coords.longitude }); setLocMsg("📍 Position partagée avec la boutique."); },
+      () => setLocMsg("Position refusée : indique ton quartier à la place."),
+      { enableHighAccuracy: true, timeout: 12000 }
+    );
+  };
 
   // Commande réelle : elle part chez Camille, qui envoie l'accusé de réception
   // WhatsApp au client, prévient le commerçant et fait apparaître la commande
@@ -56,7 +69,7 @@ export default function CartPage() {
         price: it.price,
       })),
       customer: { name: form.name, phone: tel.phone },
-      delivery: { address: form.address },
+      delivery: { address: form.address, ...(pos || {}) },
       note: form.note,
     });
     setSending(false);
@@ -244,6 +257,14 @@ export default function CartPage() {
                     placeholder="Quartier / adresse de livraison"
                     className="w-full rounded-xl border-2 border-gray-200 px-4 py-2.5 text-sm font-semibold outline-none focus:border-red-500"
                   />
+                  <button
+                    type="button"
+                    onClick={localiser}
+                    className={`w-full rounded-xl border-2 px-4 py-2.5 text-sm font-bold ${pos ? "border-green-600 bg-green-50 text-green-800" : "border-red-500 text-red-600"}`}
+                  >
+                    {pos ? "📍 Position partagée" : "📍 Me localiser (livraison plus rapide)"}
+                  </button>
+                  {locMsg && <p className="text-xs font-semibold text-gray-500">{locMsg}</p>}
                   <textarea
                     value={form.note}
                     onChange={set("note")}
