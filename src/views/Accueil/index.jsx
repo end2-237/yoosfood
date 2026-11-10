@@ -3,7 +3,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // Yoss Food — accueil « Le roi du croustillant ».
 //
-// Huit panneaux qu'on parcourt à l'horizontale : la molette les fait avancer
+// Neuf panneaux qu'on parcourt à l'horizontale : la molette les fait avancer
 // sur ordinateur, le doigt les fait glisser sur téléphone. Le menu vient du
 // catalogue Camille (source de vérité) ; tant qu'il ne répond pas, on affiche
 // le menu des affiches Yoss Food, avec les photos de leurs vidéos TikTok.
@@ -12,9 +12,10 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useCart } from "../../context/CartContext";
 import { useCamilleCatalog } from "../../hooks/useCamilleCatalog";
+import BurgerMosaique from "../../components/BurgerMosaique";
 
-const NOMS = ["Accueil", "Menu", "Poulet", "En cuisine", "Deals", "Ils ont goûté", "Livraison", "Contact"];
-const SOMBRES = new Set([2]);
+const NOMS = ["Accueil", "Le burger", "Menu", "Poulet", "En cuisine", "Deals", "Ils ont goûté", "Livraison", "Contact"];
+const SOMBRES = new Set([1, 3]);
 const WHATSAPP = "237691175480";
 
 // Menu des affiches Yoss Food : affiché tant que Camille n'a pas répondu.
@@ -155,7 +156,7 @@ export default function Accueil() {
       if (jauge.current) jauge.current.style.transform = `scaleX(${actuel})`;
       const i = Math.round(actuel * (N - 1));
       if (i !== dernier) { dernier = i; setIndex(i); }
-      const d = actuel * (N - 1) - 2; // les photos du panneau 3 volent avec l'avancée
+      const d = actuel * (N - 1) - 3; // les photos du panneau 4 volent avec l'avancée
       vols.current.forEach((el) => {
         if (!el) return;
         const k = Number(el.dataset.v);
@@ -175,6 +176,18 @@ export default function Accueil() {
       window.scrollTo({ top: v.offsetTop + (total * i) / (N - 1), behavior: "smooth" });
     }
   };
+
+  // L'écran de chargement (components/Chargement) s'efface quand l'accueil
+  // est monté et que la photo principale est prête.
+  useEffect(() => {
+    let fait = false;
+    const pret = () => { if (!fait) { fait = true; window.__yfPret?.(); } };
+    const i = new Image();
+    i.onload = i.onerror = pret;
+    i.src = "/yoss/carton-hero.jpg";
+    const t = setTimeout(pret, 4000);
+    return () => clearTimeout(t);
+  }, []);
 
   // Astuce de navigation, une fois.
   useEffect(() => {
@@ -249,11 +262,24 @@ export default function Accueil() {
               <Sticker className="st-chaud"><i className="ico"><IcoMoto /></i>Livré chaud · Douala</Sticker>
               <div className="bas">
                 <p className="tech">Burgers &amp; poulet pané · Bonamoussadi, carrefour Maison Blanche · Douala</p>
-                <button className="bouton" type="button" onClick={() => aller(1)}>Voir le menu →</button>
+                <button className="bouton" type="button" onClick={() => aller(2)}>Voir le menu →</button>
               </div>
             </section>
 
-            {/* 02 · Menu */}
+            {/* 02 · Le burger mosaïque */}
+            <section className="pan p-burger" aria-label="Le burger fait de nos photos">
+              <div className="texte">
+                <p className="tech">312 photos · un seul burger</p>
+                <h2 className="geant">Fait de<br /><em>nos photos</em></h2>
+                <p>Chaque carré est une vraie photo Yoss Food : burgers, poulet, frites, cuisine. {tactile ? "Touchez une photo pour la voir en grand." : "Cliquez sur une photo pour la voir en grand, ou faites glisser le burger pour le tourner."}</p>
+                <button className="bouton" type="button" onClick={() => aller(2)}>Voir le menu →</button>
+              </div>
+              <div className="scene-burger">
+                <BurgerMosaique plats={plats} onAjouter={ajouter} tactile={tactile} />
+              </div>
+            </section>
+
+            {/* 03 · Menu */}
             <section className="pan p-menu" aria-label="Le menu">
               <p className="geant titre" aria-hidden="true">Le menu</p>
               <div className="carte">
@@ -285,7 +311,7 @@ export default function Accueil() {
               </div>
             </section>
 
-            {/* 03 · Poulet, de nuit */}
+            {/* 04 · Poulet, de nuit */}
             <section className="pan p-poulet" aria-label="Poulet pané">
               {[
                 ["/yoss/pilons.jpg", 1, { left: "-2vw", top: "14%" }, -6],
@@ -309,7 +335,7 @@ export default function Accueil() {
               </div>
             </section>
 
-            {/* 04 · En cuisine */}
+            {/* 05 · En cuisine */}
             <section className="pan p-cuisine" aria-label="En cuisine">
               <div className="doodles" style={{ backgroundImage: `url("${doodles("#e6a22a")}")`, opacity: 0.35 }} />
               <div className="tete">
@@ -329,7 +355,7 @@ export default function Accueil() {
               </div>
             </section>
 
-            {/* 05 · Deals */}
+            {/* 06 · Deals */}
             <section className="pan p-deals" aria-label="Deals">
               <div className="doodles" style={{ backgroundImage: `url("${doodles("#c9171c")}")`, opacity: 0.25 }} />
               <div className="grille">
@@ -339,7 +365,7 @@ export default function Accueil() {
                   <div className="minuteur" aria-label="Temps restant avant minuit">
                     {temps.map((t, i) => (<div key={i}><span>{t}</span><small className="tech">{["heures", "min", "sec"][i]}</small></div>))}
                   </div>
-                  <button className="bouton" type="button" onClick={() => aller(1)}>J'en profite</button>
+                  <button className="bouton" type="button" onClick={() => aller(2)}>J'en profite</button>
                 </div>
                 <div className="collage">
                   {[
@@ -355,7 +381,7 @@ export default function Accueil() {
               </div>
             </section>
 
-            {/* 06 · Ils ont goûté */}
+            {/* 07 · Ils ont goûté */}
             <section className="pan p-gout" aria-label="Ils ont goûté">
               <div className="grille">
                 <div>
@@ -378,7 +404,7 @@ export default function Accueil() {
               </div>
             </section>
 
-            {/* 07 · Livraison */}
+            {/* 08 · Livraison */}
             <section className="pan p-livraison" aria-label="Livraison">
               <div className="grille">
                 <div>
@@ -407,7 +433,7 @@ export default function Accueil() {
               </div>
             </section>
 
-            {/* 08 · Contact */}
+            {/* 09 · Contact */}
             <section className="pan p-fin" aria-label="Contact">
               <div>
                 <div className="bandeau" aria-hidden="true">

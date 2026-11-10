@@ -1,12 +1,13 @@
-"use client";
+import Chargement from "../components/Chargement";
+import AccueilClient from "./AccueilClient";
 
-import dynamic from "next/dynamic";
-
-// L'expérience d'accueil est fortement pilotée par l'état client (panier en
-// localStorage, animations, catalogue chargé depuis Camille). On la rend
-// uniquement côté client pour éviter tout souci de SSR (window/localStorage).
-const YossFoodApp = dynamic(() => import("../App"), { ssr: false });
-
+// La page est rendue côté serveur pour que l'écran de chargement soit dans le
+// HTML et s'affiche tout de suite ; l'accueil lui-même est rendu côté client.
 export default function Page() {
-  return <YossFoodApp />;
+  return (
+    <>
+      <Chargement />
+      <AccueilClient />
+    </>
+  );
 }
