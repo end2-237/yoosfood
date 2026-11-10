@@ -3,7 +3,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 // Yoss Food — accueil « Le roi du croustillant ».
 //
-// Neuf panneaux qu'on parcourt à l'horizontale : la molette les fait avancer
+// Huit panneaux qu'on parcourt à l'horizontale : la molette les fait avancer
 // sur ordinateur, le doigt les fait glisser sur téléphone. Le menu vient du
 // catalogue Camille (source de vérité) ; tant qu'il ne répond pas, on affiche
 // le menu des affiches Yoss Food, avec les photos de leurs vidéos TikTok.
@@ -14,9 +14,11 @@ import { useCart } from "../../context/CartContext";
 import { useCamilleCatalog } from "../../hooks/useCamilleCatalog";
 import BurgerMosaique from "../../components/BurgerMosaique";
 
-const NOMS = ["Accueil", "Le burger", "Menu", "Poulet", "En cuisine", "Deals", "Ils ont goûté", "Livraison", "Contact"];
-const SOMBRES = new Set([1, 3]);
+const NOMS = ["Accueil", "Menu", "Poulet", "En cuisine", "Deals", "Ils ont goûté", "Livraison", "Contact"];
+const SOMBRES = new Set([2]);
 const WHATSAPP = "237691175480";
+const TIKTOK = "https://www.tiktok.com/@yossfood";
+const VIDEOS = ["/yoss/tiktok/tiktok-1", "/yoss/tiktok/tiktok-2", "/yoss/tiktok/tiktok-3"];
 
 // Menu des affiches Yoss Food : affiché tant que Camille n'a pas répondu.
 const MENU_AFFICHES = [
@@ -35,19 +37,6 @@ const MENU_AFFICHES = [
 const f = (n) => `${Math.round(Number(n) || 0).toLocaleString("fr-FR").replace(/ | /g, " ")} F`;
 const estBurger = (cat) => /burger|sandwich/i.test(cat || "");
 
-const Couronne = () => (
-  <svg className="couronne" viewBox="0 0 140 104" aria-hidden="true">
-    <path d="M16 86 L9 34 Q8 26 15 31 L44 54 L64 18 Q70 9 76 18 L96 54 L125 31 Q132 26 131 34 L124 86 Z" fill="#ffc62e" stroke="#140506" strokeWidth="5" strokeLinejoin="round" />
-    <path d="M28 60 Q70 46 112 60" fill="none" stroke="#fff3c4" strokeWidth="4" strokeLinecap="round" opacity=".8" />
-    <rect x="12" y="76" width="116" height="22" rx="8" fill="#e3231c" stroke="#140506" strokeWidth="5" />
-    <circle cx="42" cy="87" r="5" fill="#ffc62e" stroke="#140506" strokeWidth="2.5" />
-    <circle cx="70" cy="87" r="6.5" fill="#fff8ee" stroke="#140506" strokeWidth="2.5" />
-    <circle cx="98" cy="87" r="5" fill="#ffc62e" stroke="#140506" strokeWidth="2.5" />
-    <circle cx="9" cy="28" r="8" fill="#e3231c" stroke="#140506" strokeWidth="4" />
-    <circle cx="70" cy="10" r="9" fill="#e3231c" stroke="#140506" strokeWidth="4" />
-    <circle cx="131" cy="28" r="8" fill="#e3231c" stroke="#140506" strokeWidth="4" />
-  </svg>
-);
 const IcoCuisse = () => (
   <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M30 6c8 0 13 7 11 15-2 7-10 10-16 7L13 40c-2 2-5 0-4-3l7-9c-6-5-4-22 14-22z" fill="currentColor" /><circle cx="11" cy="40" r="4" fill="currentColor" /></svg>
 );
@@ -104,6 +93,7 @@ export default function Accueil() {
   const piste = useRef(null);
   const jauge = useRef(null);
   const vols = useRef([]);
+  const videos = useRef([]);
   const roi = useRef(null);
   const [index, setIndex] = useState(0);
   const [tactile, setTactile] = useState(false);
@@ -156,7 +146,7 @@ export default function Accueil() {
       if (jauge.current) jauge.current.style.transform = `scaleX(${actuel})`;
       const i = Math.round(actuel * (N - 1));
       if (i !== dernier) { dernier = i; setIndex(i); }
-      const d = actuel * (N - 1) - 3; // les photos du panneau 4 volent avec l'avancée
+      const d = actuel * (N - 1) - 2; // les photos du panneau 3 volent avec l'avancée
       vols.current.forEach((el) => {
         if (!el) return;
         const k = Number(el.dataset.v);
@@ -179,13 +169,28 @@ export default function Accueil() {
 
   // L'écran de chargement (components/Chargement) s'efface quand l'accueil
   // est monté et que la photo principale est prête.
+  const dejaPret = useRef(false);
+  const signalerPret = () => {
+    if (dejaPret.current) return;
+    dejaPret.current = true;
+    window.__yfPret?.();
+  };
   useEffect(() => {
-    let fait = false;
-    const pret = () => { if (!fait) { fait = true; window.__yfPret?.(); } };
-    const i = new Image();
-    i.onload = i.onerror = pret;
-    i.src = "/yoss/carton-hero.jpg";
-    const t = setTimeout(pret, 4000);
+    const t = setTimeout(signalerPret, 4000);
+    return () => clearTimeout(t);
+  }, []);
+
+  // Les vidéos TikTok du logo ne se chargent qu'une fois la page affichée,
+  // pour ne pas retarder le premier écran ; pas de lecture si l'appareil
+  // demande moins d'animations (l'image d'attente reste affichée).
+  useEffect(() => {
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const lancer = () =>
+      videos.current.forEach((v) => {
+        if (!v.src) v.src = v.dataset.src;
+        v.play?.().catch(() => {});
+      });
+    const t = setTimeout(lancer, 1500);
     return () => clearTimeout(t);
   }, []);
 
@@ -198,7 +203,7 @@ export default function Accueil() {
     return () => { clearTimeout(a); clearTimeout(b); };
   }, []);
 
-  // La couronne et le carton suivent un peu la souris.
+  // Le logo TikTok suit un peu la souris.
   useEffect(() => {
     if (tactile) return;
     const bouger = (e) => {
@@ -252,34 +257,29 @@ export default function Accueil() {
             <section className="pan p-accueil" aria-label="Accueil">
               <div className="doodles" style={{ backgroundImage: `url("${doodles("#e6a22a")}")` }} />
               <h1 className="geant ligne1">Le roi du</h1>
-              <div className="roi" ref={roi}>
-                <img className="plat" src="/yoss/carton-hero.jpg" alt="Carton de frites au poulet pané et cheddar, Yoss Food" />
-                <Couronne />
+              <div className="heros-burger">
+                <BurgerMosaique plats={plats} onAjouter={ajouter} tactile={tactile} onPret={signalerPret} />
               </div>
+              <a className="logo-tiktok" href={TIKTOK} target="_blank" rel="noreferrer" ref={roi} aria-label="Nos vidéos sur TikTok : @yossfood">
+                <span className="vids">
+                  {VIDEOS.map((v) => (
+                    <video key={v} ref={(el) => el && !videos.current.includes(el) && videos.current.push(el)} poster={`${v}.jpg`} muted loop playsInline preload="none" data-src={`${v}.mp4`} />
+                  ))}
+                </span>
+                <img src="/yoss/chargement/logo-dessus.webp" alt="" width="400" height="356" />
+              </a>
+              <p className="pastille tech"><b>●</b> {tactile ? "Touchez une photo du burger" : "312 photos Yoss Food · cliquez-en une"}</p>
               <p className="geant ligne2">Crousti<em>llant</em></p>
               <Sticker className="st-main"><i className="ico"><IcoCuisse /></i>Pané<br />à la main</Sticker>
               <Sticker className="st-prix"><i className="ico"><IcoBurger /></i>Dès<br />1 000 F</Sticker>
               <Sticker className="st-chaud"><i className="ico"><IcoMoto /></i>Livré chaud · Douala</Sticker>
               <div className="bas">
                 <p className="tech">Burgers &amp; poulet pané · Bonamoussadi, carrefour Maison Blanche · Douala</p>
-                <button className="bouton" type="button" onClick={() => aller(2)}>Voir le menu →</button>
+                <button className="bouton" type="button" onClick={() => aller(1)}>Voir le menu →</button>
               </div>
             </section>
 
-            {/* 02 · Le burger mosaïque */}
-            <section className="pan p-burger" aria-label="Le burger fait de nos photos">
-              <div className="texte">
-                <p className="tech">312 photos · un seul burger</p>
-                <h2 className="geant">Fait de<br /><em>nos photos</em></h2>
-                <p>Chaque carré est une vraie photo Yoss Food : burgers, poulet, frites, cuisine. {tactile ? "Touchez une photo pour la voir en grand." : "Cliquez sur une photo pour la voir en grand, ou faites glisser le burger pour le tourner."}</p>
-                <button className="bouton" type="button" onClick={() => aller(2)}>Voir le menu →</button>
-              </div>
-              <div className="scene-burger">
-                <BurgerMosaique plats={plats} onAjouter={ajouter} tactile={tactile} />
-              </div>
-            </section>
-
-            {/* 03 · Menu */}
+            {/* 02 · Menu */}
             <section className="pan p-menu" aria-label="Le menu">
               <p className="geant titre" aria-hidden="true">Le menu</p>
               <div className="carte">
@@ -311,7 +311,7 @@ export default function Accueil() {
               </div>
             </section>
 
-            {/* 04 · Poulet, de nuit */}
+            {/* 03 · Poulet, de nuit */}
             <section className="pan p-poulet" aria-label="Poulet pané">
               {[
                 ["/yoss/pilons.jpg", 1, { left: "-2vw", top: "14%" }, -6],
@@ -335,7 +335,7 @@ export default function Accueil() {
               </div>
             </section>
 
-            {/* 05 · En cuisine */}
+            {/* 04 · En cuisine */}
             <section className="pan p-cuisine" aria-label="En cuisine">
               <div className="doodles" style={{ backgroundImage: `url("${doodles("#e6a22a")}")`, opacity: 0.35 }} />
               <div className="tete">
@@ -355,7 +355,7 @@ export default function Accueil() {
               </div>
             </section>
 
-            {/* 06 · Deals */}
+            {/* 05 · Deals */}
             <section className="pan p-deals" aria-label="Deals">
               <div className="doodles" style={{ backgroundImage: `url("${doodles("#c9171c")}")`, opacity: 0.25 }} />
               <div className="grille">
@@ -365,7 +365,7 @@ export default function Accueil() {
                   <div className="minuteur" aria-label="Temps restant avant minuit">
                     {temps.map((t, i) => (<div key={i}><span>{t}</span><small className="tech">{["heures", "min", "sec"][i]}</small></div>))}
                   </div>
-                  <button className="bouton" type="button" onClick={() => aller(2)}>J'en profite</button>
+                  <button className="bouton" type="button" onClick={() => aller(1)}>J'en profite</button>
                 </div>
                 <div className="collage">
                   {[
@@ -381,7 +381,7 @@ export default function Accueil() {
               </div>
             </section>
 
-            {/* 07 · Ils ont goûté */}
+            {/* 06 · Ils ont goûté */}
             <section className="pan p-gout" aria-label="Ils ont goûté">
               <div className="grille">
                 <div>
@@ -404,7 +404,7 @@ export default function Accueil() {
               </div>
             </section>
 
-            {/* 08 · Livraison */}
+            {/* 07 · Livraison */}
             <section className="pan p-livraison" aria-label="Livraison">
               <div className="grille">
                 <div>
@@ -433,7 +433,7 @@ export default function Accueil() {
               </div>
             </section>
 
-            {/* 09 · Contact */}
+            {/* 08 · Contact */}
             <section className="pan p-fin" aria-label="Contact">
               <div>
                 <div className="bandeau" aria-hidden="true">

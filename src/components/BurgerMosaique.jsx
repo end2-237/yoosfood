@@ -177,7 +177,7 @@ function preparer(B, sprite, texture) {
   return { W, H, T, C, Rr, Y0, NR, ligneDe, nT, bande, S, flou, ed, en };
 }
 
-export default function BurgerMosaique({ plats = [], onAjouter, tactile = false }) {
+export default function BurgerMosaique({ plats = [], onAjouter, tactile = false, onPret }) {
   const toile = useRef(null);
   const etat = useRef({ auto: true });
   const [pret, setPret] = useState(false);
@@ -186,6 +186,8 @@ export default function BurgerMosaique({ plats = [], onAjouter, tactile = false 
   const [ajoute, setAjoute] = useState(false);
   const [grandes, setGrandes] = useState([]);
   const carte = useRef(null);
+  const onPretRef = useRef(onPret);
+  onPretRef.current = onPret;
 
   useEffect(() => {
     const cv = toile.current;
@@ -200,11 +202,12 @@ export default function BurgerMosaique({ plats = [], onAjouter, tactile = false 
         chargerImage(DOSSIER + "tuiles.webp"),
         chargerImage(DOSSIER + "texture.webp"),
       ]);
-      if (fini || !sprite || !texture) return;
+      if (fini) return;
+      if (!sprite || !texture) { setSansWebgl(true); onPretRef.current?.(); return; }
       setGrandes([...new Set(B.grand)]);
       const D = preparer(B, sprite, texture);
       gl = cv.getContext("webgl", { premultipliedAlpha: false, antialias: true });
-      if (!gl) { setSansWebgl(true); return; }
+      if (!gl) { setSansWebgl(true); onPretRef.current?.(); return; }
       const shader = (type, src) => {
         const o = gl.createShader(type);
         gl.shaderSource(o, src);
@@ -215,7 +218,7 @@ export default function BurgerMosaique({ plats = [], onAjouter, tactile = false 
       gl.attachShader(pr, shader(gl.VERTEX_SHADER, VS));
       gl.attachShader(pr, shader(gl.FRAGMENT_SHADER, FS));
       gl.linkProgram(pr);
-      if (!gl.getProgramParameter(pr, gl.LINK_STATUS)) { setSansWebgl(true); return; }
+      if (!gl.getProgramParameter(pr, gl.LINK_STATUS)) { setSansWebgl(true); onPretRef.current?.(); return; }
       gl.useProgram(pr);
       gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
       gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
@@ -342,6 +345,7 @@ export default function BurgerMosaique({ plats = [], onAjouter, tactile = false 
         cv.removeEventListener("pointerleave", sort);
       });
       setPret(true);
+      requestAnimationFrame(() => onPretRef.current?.());
     })();
 
     return () => {
