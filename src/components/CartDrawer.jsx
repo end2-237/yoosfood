@@ -11,7 +11,6 @@ import {
   ChevronRight,
   MessageCircle,
   Truck,
-  Sparkles,
   Drumstick,
   Pizza,
   CupSoda,
@@ -26,7 +25,6 @@ import { useCamilleCatalog } from "../hooks/useCamilleCatalog";
 // Repli seulement : le numéro fait autorité côté agent Camille. Il ne sert
 // que le temps du chargement, ou si l'agent n'en déclare aucun.
 const WHATSAPP_FALLBACK = "237691175480";
-const FREE_DELIVERY = 5000;
 
 /* doodles food subtils en fond du tiroir */
 const DOODLE_ICONS = [Drumstick, Pizza, CupSoda, IceCream, Sandwich, Cookie, Beef];
@@ -62,8 +60,6 @@ export default function CartDrawer() {
     window.open(`https://wa.me/${whatsapp}?text=${encodeURIComponent(msg)}`, "_blank");
   };
 
-  const remaining = Math.max(0, FREE_DELIVERY - total);
-  const progress = Math.min(100, (total / FREE_DELIVERY) * 100);
 
   return (
     <>
@@ -138,24 +134,12 @@ export default function CartDrawer() {
           </div>
         ) : (
           <>
-            {/* barre livraison offerte */}
+            {/* livraison : aucun montant inventé, la boutique confirme */}
             <div className="relative z-10 mx-6 mb-3 rounded-2xl border border-white/10 bg-white/5 p-3">
               <p className="flex items-center gap-2 text-xs font-semibold text-gray-200">
                 <Truck size={15} className="text-amber-400" />
-                {remaining > 0 ? (
-                  <>Plus que <span className="font-black text-amber-400">{formatFCFA(remaining)}</span> pour la livraison offerte&nbsp;!</>
-                ) : (
-                  <span className="flex items-center gap-1 font-black text-green-400">
-                    <Sparkles size={14} /> Livraison offerte débloquée !
-                  </span>
-                )}
+                Livraison dans Douala : frais confirmés par la boutique selon ton quartier.
               </p>
-              <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-white/10">
-                <div
-                  className="h-full rounded-full bg-gradient-to-r from-amber-400 to-red-500 transition-all duration-500"
-                  style={{ width: `${progress}%` }}
-                />
-              </div>
             </div>
 
             {/* articles */}
@@ -220,12 +204,12 @@ export default function CartDrawer() {
                 </div>
                 <div className="flex justify-between text-gray-300">
                   <span>Livraison</span>
-                  <span className="font-bold text-green-400">{remaining > 0 ? formatFCFA(800) : "Offerte"}</span>
+                  <span className="font-bold text-gray-300">Selon le quartier</span>
                 </div>
                 <div className="mt-1 flex items-center justify-between border-t border-white/10 pt-3 text-lg">
                   <span className="font-black">Total</span>
                   <span className="font-black text-amber-400">
-                    {formatFCFA(total + (remaining > 0 ? 800 : 0))}
+                    {formatFCFA(total)}
                   </span>
                 </div>
               </div>

@@ -228,7 +228,7 @@ export default function CartPage() {
                   </div>
                   <div className="flex justify-between text-gray-600">
                     <span>Livraison</span>
-                    <span className="font-bold text-green-600">Offerte</span>
+                    <span className="font-bold text-gray-600">Selon le quartier</span>
                   </div>
                   <div className="my-2 border-t border-dashed border-gray-200" />
                   <div className="flex justify-between text-base">
